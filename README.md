@@ -14,7 +14,8 @@ The project leverages Python, pandas, seaborn, and matplotlib for data visualiza
 - **pandas** 
 - **numpy** 
 - **matplotlib** 
-- **seaborn** 
+- **seaborn**
+- **streamlit** 
 
 ## Dataset
 The dataset used in this project contains basketball-related statistics such as:
