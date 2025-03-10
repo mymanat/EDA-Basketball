@@ -29,16 +29,336 @@ def load_teams(year):
     return html
 
 #load the data and remove the divisions in the rows as appeared in the website
-if(selected_year < 1971):
+if selected_year < 1971:
     df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
+
+    df2 = load_teams(selected_year)[1]
+
+    df1['G'] = ''
+    df1['MP'] = ''
+    df1['FG'] = ''
+    df1['FGA'] = ''
+    df1['FG%'] = ''
+    df1['3P'] = ''
+    df1['3PA'] = ''
+    df1['3P%'] = ''
+    df1['2P'] = ''
+    df1['2PA'] = ''
+    df1['2P%'] = ''
+    df1['FT'] = ''
+    df1['FTA'] = ''
+    df1['FT%'] = ''
+    df1['ORB'] = ''
+    df1['DRB'] = ''
+    df1['TRB'] = ''
+    df1['AST'] = ''
+    df1['STL'] = ''
+    df1['BLK'] = ''
+    df1['TOV'] = ''
+    df1['PF'] = ''
+
+    for i in range(len(df1)):
+        for j in range(len(df2)):
+            if df1['Team'].iloc[i] == df2['Team'].iloc[j]:
+                df1['G'].iloc[i] = df2['G'].iloc[j]
+                df1['MP'].iloc[i] = df2['MP'].iloc[j]
+                df1['FG'].iloc[i] = df2['FG'].iloc[j]
+                df1['FGA'].iloc[i] = df2['FGA'].iloc[j]
+                df1['FG%'].iloc[i] = df2['FG%'].iloc[j]
+                df1['3P'].iloc[i] = df2['3P'].iloc[j]
+                df1['3PA'].iloc[i] = df2['3PA'].iloc[j]
+                df1['3P%'].iloc[i] = df2['3P%'].iloc[j]
+                df1['2P'].iloc[i] = df2['2P'].iloc[j]
+                df1['2PA'].iloc[i] = df2['2PA'].iloc[j]
+                df1['2P%'].iloc[i] = df2['2P%'].iloc[j]
+                df1['FT'].iloc[i] = df2['FT'].iloc[j]
+                df1['FTA'].iloc[i] = df2['FTA'].iloc[j]
+                df1['FT%'].iloc[i] = df2['FT%'].iloc[j]
+                df1['ORB'].iloc[i] = df2['ORB'].iloc[j]
+                df1['DRB'].iloc[i] = df2['DRB'].iloc[j]
+                df1['TRB'].iloc[i] = df2['TRB'].iloc[j]
+                df1['AST'].iloc[i] = df2['AST'].iloc[j]
+                df1['STL'].iloc[i] = df2['STL'].iloc[j]
+                df1['BLK'].iloc[i] = df2['BLK'].iloc[j]
+                df1['TOV'].iloc[i] = df2['TOV'].iloc[j]
+                df1['PF'].iloc[i] = df2['PF'].iloc[j]
+
+    #create a 1 row of 2 columns to display the dataframes
+    st.dataframe(df1)
+
+    all_teams_stats = df1.drop(['G', 'W', 'SRS', 'L', 'GB'], axis=1)
+    
+    #highest correlation with winrate
+    if st.button('Correlation Heatmap'):
+        st.header(f'Correlation Heatmap of the {selected_year} NBA Teams statistics')
+        all_teams_stats_numeric = all_teams_stats.apply(pd.to_numeric, errors='coerce').select_dtypes(include=['number']).dropna(axis=1, how='all')
+        corr = all_teams_stats_numeric.corr()
+        fig, ax = plt.subplots()
+        plot = sns.heatmap(corr, cmap='coolwarm')
+        st.pyplot(fig)
+
+        fig, ax = plt.subplots()
+        plot = all_teams_stats_numeric.corr()['W/L%'].drop(index='W/L%', errors='ignore').sort_values().plot(kind='bar', ax=ax)
+        ax.set_xlabel('Statistics')
+        ax.set_ylabel('Correlation with W/L%')
+        ax.set_title(f'Correlation of different statistics impacting the W/L% for the {selected_year} season')
+        st.pyplot(fig)
+
+    
+
+elif selected_year>=1971 and selected_year<2016:
+    df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
+    df2 = load_teams(selected_year)[1].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
+
+    df3 = load_teams(selected_year)[2]
+
+    df1['G'] = ''
+    df1['MP']  = ''
+    df1['FG']  = ''
+    df1['FGA']  = ''
+    df1['FG%']  = ''
+    df1['3P'] = ''
+    df1['3PA'] = ''
+    df1['3P%'] = ''
+    df1['2P'] = ''
+    df1['2PA'] = ''
+    df1['2P%'] = ''
+    df1['FT'] = ''
+    df1['FTA'] = ''
+    df1['FT%'] = ''
+    df1['ORB'] = ''
+    df1['DRB'] = ''
+    df1['TRB'] = ''
+    df1['AST'] = ''
+    df1['STL'] = ''
+    df1['BLK'] = ''
+    df1['TOV'] = ''
+    df1['PF'] = ''
+
+    df2['G'] = ''
+    df2['MP']  = ''
+    df2['FG']  = ''
+    df2['FGA']  = ''
+    df2['FG%']  = ''
+    df2['3P'] = ''
+    df2['3PA'] = ''
+    df2['3P%'] = ''
+    df2['2P'] = ''
+    df2['2PA'] = ''
+    df2['2P%'] = ''
+    df2['FT'] = ''
+    df2['FTA'] = ''
+    df2['FT%'] = ''
+    df2['ORB'] = ''
+    df2['DRB'] = ''
+    df2['TRB'] = ''
+    df2['AST'] = ''
+    df2['STL'] = ''
+    df2['BLK'] = ''
+    df2['TOV'] = ''
+    df2['PF'] = ''
+
+    for i in range(len(df1)):
+        for j in range(len(df3)):
+            if df1['Eastern Conference'].iloc[i] == df3['Team'].iloc[j]:
+                df1['G'].iloc[i] = df3['G'].iloc[j]
+                df1['MP'].iloc[i] = df3['MP'].iloc[j]
+                df1['FG'].iloc[i] = df3['FG'].iloc[j]
+                df1['FGA'].iloc[i] = df3['FGA'].iloc[j]
+                df1['FG%'].iloc[i] = df3['FG%'].iloc[j]
+                df1['3P'].iloc[i] = df3['3P'].iloc[j]
+                df1['3PA'].iloc[i] = df3['3PA'].iloc[j]
+                df1['3P%'].iloc[i] = df3['3P%'].iloc[j]
+                df1['2P'].iloc[i] = df3['2P'].iloc[j]
+                df1['2PA'].iloc[i] = df3['2PA'].iloc[j]
+                df1['2P%'].iloc[i] = df3['2P%'].iloc[j]
+                df1['FT'].iloc[i] = df3['FT'].iloc[j]
+                df1['FTA'].iloc[i] = df3['FTA'].iloc[j]
+                df1['FT%'].iloc[i] = df3['FT%'].iloc[j]
+                df1['ORB'].iloc[i] = df3['ORB'].iloc[j]
+                df1['DRB'].iloc[i] = df3['DRB'].iloc[j]
+                df1['TRB'].iloc[i] = df3['TRB'].iloc[j]
+                df1['AST'].iloc[i] = df3['AST'].iloc[j]
+                df1['STL'].iloc[i] = df3['STL'].iloc[j]
+                df1['BLK'].iloc[i] = df3['BLK'].iloc[j]
+                df1['TOV'].iloc[i] = df3['TOV'].iloc[j]
+                df1['PF'].iloc[i] = df3['PF'].iloc[j]
+            
+    for i in range(len(df2)):
+        for j in range(len(df3)):
+            if df2['Western Conference'].iloc[i] == df3['Team'].iloc[j]:
+                df2['G'].iloc[i] = df3['G'].iloc[j]
+                df2['MP'].iloc[i] = df3['MP'].iloc[j]
+                df2['FG'].iloc[i] = df3['FG'].iloc[j]
+                df2['FGA'].iloc[i] = df3['FGA'].iloc[j]
+                df2['FG%'].iloc[i] = df3['FG%'].iloc[j]
+                df2['3P'].iloc[i] = df3['3P'].iloc[j]
+                df2['3PA'].iloc[i] = df3['3PA'].iloc[j]
+                df2['3P%'].iloc[i] = df3['3P%'].iloc[j]
+                df2['2P'].iloc[i] = df3['2P'].iloc[j]
+                df2['2PA'].iloc[i] = df3['2PA'].iloc[j]
+                df2['2P%'].iloc[i] = df3['2P%'].iloc[j]
+                df2['FT'].iloc[i] = df3['FT'].iloc[j]
+                df2['FTA'].iloc[i] = df3['FTA'].iloc[j]
+                df2['FT%'].iloc[i] = df3['FT%'].iloc[j]
+                df2['ORB'].iloc[i] = df3['ORB'].iloc[j]
+                df2['DRB'].iloc[i] = df3['DRB'].iloc[j]
+                df2['TRB'].iloc[i] = df3['TRB'].iloc[j]
+                df2['AST'].iloc[i] = df3['AST'].iloc[j]
+                df2['STL'].iloc[i] = df3['STL'].iloc[j]
+                df2['BLK'].iloc[i] = df3['BLK'].iloc[j]
+                df2['TOV'].iloc[i] = df3['TOV'].iloc[j]
+                df2['PF'].iloc[i] = df3['PF'].iloc[j]
+
+    all_teams_stats = pd.concat([df1,df2], ignore_index=True, axis=0).drop(['Eastern Conference', 'Western Conference', 'G', 'W', 'SRS', 'L', 'GB'], axis=1)
+    
+    #create a 1 row of 2 columns to display the dataframes
+    rows = st.columns(2)
+    rows[0].dataframe(df1)
+    rows[1].dataframe(df2)
+
+    #highest correlation with winrate
+    if st.button('Correlation Heatmap'):
+        st.header(f'Correlation Heatmap of the {selected_year} NBA Teams statistics')
+        all_teams_stats_numeric = all_teams_stats.apply(pd.to_numeric, errors='coerce').select_dtypes(include=['number']).dropna(axis=1, how='all')
+        corr = all_teams_stats_numeric.corr()
+        fig, ax = plt.subplots()
+        plot = sns.heatmap(corr, cmap='coolwarm')
+        st.pyplot(fig)
+
+        fig, ax = plt.subplots()
+        plot = all_teams_stats_numeric.corr()['W/L%'].drop(index='W/L%', errors='ignore').sort_values().plot(kind='bar', ax=ax)
+        ax.set_xlabel('Statistics')
+        ax.set_ylabel('Correlation with W/L%')
+        ax.set_title(f'Correlation of different statistics impacting the W/L% for the {selected_year} season')
+        st.pyplot(fig)
+
 else:
     df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
     df2 = load_teams(selected_year)[1].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
 
-#create a 1 row of 2 columns to display the dataframes
-rows = st.columns(2)
-rows[0].dataframe(df1)
-rows[1].dataframe(df2)
+    df3 = load_teams(selected_year)[4]
+
+    df1['G'] = ''
+    df1['MP']  = ''
+    df1['FG']  = ''
+    df1['FGA']  = ''
+    df1['FG%']  = ''
+    df1['3P'] = ''
+    df1['3PA'] = ''
+    df1['3P%'] = ''
+    df1['2P'] = ''
+    df1['2PA'] = ''
+    df1['2P%'] = ''
+    df1['FT'] = ''
+    df1['FTA'] = ''
+    df1['FT%'] = ''
+    df1['ORB'] = ''
+    df1['DRB'] = ''
+    df1['TRB'] = ''
+    df1['AST'] = ''
+    df1['STL'] = ''
+    df1['BLK'] = ''
+    df1['TOV'] = ''
+    df1['PF'] = ''
+
+    df2['G'] = ''
+    df2['MP']  = ''
+    df2['FG']  = ''
+    df2['FGA']  = ''
+    df2['FG%']  = ''
+    df2['3P'] = ''
+    df2['3PA'] = ''
+    df2['3P%'] = ''
+    df2['2P'] = ''
+    df2['2PA'] = ''
+    df2['2P%'] = ''
+    df2['FT'] = ''
+    df2['FTA'] = ''
+    df2['FT%'] = ''
+    df2['ORB'] = ''
+    df2['DRB'] = ''
+    df2['TRB'] = ''
+    df2['AST'] = ''
+    df2['STL'] = ''
+    df2['BLK'] = ''
+    df2['TOV'] = ''
+    df2['PF'] = ''
+
+    for i in range(len(df1)):
+        for j in range(len(df3)):
+            if df1['Eastern Conference'].iloc[i] == df3['Team'].iloc[j]:
+                df1['G'].iloc[i] = df3['G'].iloc[j]
+                df1['MP'].iloc[i] = df3['MP'].iloc[j]
+                df1['FG'].iloc[i] = df3['FG'].iloc[j]
+                df1['FGA'].iloc[i] = df3['FGA'].iloc[j]
+                df1['FG%'].iloc[i] = df3['FG%'].iloc[j]
+                df1['3P'].iloc[i] = df3['3P'].iloc[j]
+                df1['3PA'].iloc[i] = df3['3PA'].iloc[j]
+                df1['3P%'].iloc[i] = df3['3P%'].iloc[j]
+                df1['2P'].iloc[i] = df3['2P'].iloc[j]
+                df1['2PA'].iloc[i] = df3['2PA'].iloc[j]
+                df1['2P%'].iloc[i] = df3['2P%'].iloc[j]
+                df1['FT'].iloc[i] = df3['FT'].iloc[j]
+                df1['FTA'].iloc[i] = df3['FTA'].iloc[j]
+                df1['FT%'].iloc[i] = df3['FT%'].iloc[j]
+                df1['ORB'].iloc[i] = df3['ORB'].iloc[j]
+                df1['DRB'].iloc[i] = df3['DRB'].iloc[j]
+                df1['TRB'].iloc[i] = df3['TRB'].iloc[j]
+                df1['AST'].iloc[i] = df3['AST'].iloc[j]
+                df1['STL'].iloc[i] = df3['STL'].iloc[j]
+                df1['BLK'].iloc[i] = df3['BLK'].iloc[j]
+                df1['TOV'].iloc[i] = df3['TOV'].iloc[j]
+                df1['PF'].iloc[i] = df3['PF'].iloc[j]
+    
+    for i in range(len(df2)):
+        for j in range(len(df3)):
+            if df2['Western Conference'].iloc[i] == df3['Team'].iloc[j]:
+                df2['G'].iloc[i] = df3['G'].iloc[j]
+                df2['MP'].iloc[i] = df3['MP'].iloc[j]
+                df2['FG'].iloc[i] = df3['FG'].iloc[j]
+                df2['FGA'].iloc[i] = df3['FGA'].iloc[j]
+                df2['FG%'].iloc[i] = df3['FG%'].iloc[j]
+                df2['3P'].iloc[i] = df3['3P'].iloc[j]
+                df2['3PA'].iloc[i] = df3['3PA'].iloc[j]
+                df2['3P%'].iloc[i] = df3['3P%'].iloc[j]
+                df2['2P'].iloc[i] = df3['2P'].iloc[j]
+                df2['2PA'].iloc[i] = df3['2PA'].iloc[j]
+                df2['2P%'].iloc[i] = df3['2P%'].iloc[j]
+                df2['FT'].iloc[i] = df3['FT'].iloc[j]
+                df2['FTA'].iloc[i] = df3['FTA'].iloc[j]
+                df2['FT%'].iloc[i] = df3['FT%'].iloc[j]
+                df2['ORB'].iloc[i] = df3['ORB'].iloc[j]
+                df2['DRB'].iloc[i] = df3['DRB'].iloc[j]
+                df2['TRB'].iloc[i] = df3['TRB'].iloc[j]
+                df2['AST'].iloc[i] = df3['AST'].iloc[j]
+                df2['STL'].iloc[i] = df3['STL'].iloc[j]
+                df2['BLK'].iloc[i] = df3['BLK'].iloc[j]
+                df2['TOV'].iloc[i] = df3['TOV'].iloc[j]
+                df2['PF'].iloc[i] = df3['PF'].iloc[j]
+    
+    all_teams_stats = pd.concat([df1,df2], ignore_index=True, axis=0).drop(['Eastern Conference', 'Western Conference', 'G', 'W', 'SRS', 'L', 'GB'], axis=1)
+    
+    #create a 1 row of 2 columns to display the dataframes
+    rows = st.columns(2)
+    rows[0].dataframe(df1)
+    rows[1].dataframe(df2)
+
+    #highest correlation with winrate
+    if st.button('Correlation Heatmap'):
+        st.header(f'Correlation Heatmap of the {selected_year} NBA Teams statistics')
+        all_teams_stats_numeric = all_teams_stats.apply(pd.to_numeric, errors='coerce').select_dtypes(include=['number']).dropna(axis=1, how='all')
+        corr = all_teams_stats_numeric.corr()
+        fig, ax = plt.subplots()
+        plot = sns.heatmap(corr, cmap='coolwarm')
+        st.pyplot(fig)
+
+        fig, ax = plt.subplots()
+        plot = all_teams_stats_numeric.corr()['W/L%'].drop(index='W/L%', errors='ignore').sort_values().plot(kind='bar', ax=ax)
+        ax.set_xlabel('Statistics')
+        ax.set_ylabel('Correlation with W/L%')
+        ax.set_title(f'Correlation of different statistics impacting the W/L% for the {selected_year} season')
+        st.pyplot(fig)
 
 #create a gameEvolution cv file to store data and to avoid making a lot of requests to the website
 game_evolution_csv = 'gameEvolution.csv'
@@ -62,7 +382,7 @@ else:
     steal_list = []
     block_list = []
     year_list = []
-    #iterate through each yesr to collect the data, calculate its average
+    #iterate through each year to collect the data, calculate its average
     # and append it to its respective lists
     #three different conditions because the data is structured differently for each bracket of years in the website
     for i in range(1950,2025):
@@ -130,6 +450,15 @@ else:
     #if the csv file does not exist, create it
     game_evolution_df = pd.DataFrame({'Year': year_list, 'PPG': ppg_list, '2P': two_point_list, '2PA': two_point_attempt_list, '2P%': two_point_percentage_list, '3P': three_point_list, '3PA': three_point_attempt_list, '3P%': three_point_percentage_list, 'FT': free_throw_list, 'FTA': free_throw_attempt_list, 'FT%': free_throw_percentage_list, 'TRB': total_rebound_list, 'AST': assist_list, 'STL': steal_list, 'BLK': block_list})
     game_evolution_df.to_csv(game_evolution_csv, index=False)
+
+#highest correlation with winrate
+# if st.button('Correlation Heatmap'):
+#     st.header(f'Correlation Heatmap of the {selected_year} NBA Teams statistics')
+#     all_teams_stats_numeric = all_teams_stats.select_dtypes(include=['number'])
+#     corr = all_teams_stats_numeric.corr()
+#     fig, ax = plt.subplots()
+#     plot = sns.heatmap(corr, cmap='coolwarm')
+#     st.pyplot(fig)
 
 #plot the evolution of PPG
 fig, ax= plt.subplots(figsize=(10, 6))
