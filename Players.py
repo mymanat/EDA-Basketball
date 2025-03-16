@@ -27,17 +27,6 @@ def load_data(year):
     html = pd.read_html(get_html(url), header = 0)
     time.sleep(2)
     df = html[0]
-
-    # url1 = "https://www.basketball-reference.com/leagues/NBA_" + str(year) + ".html"
-    # html1 = pd.read_html(get_html(url1), header = 0)
-    # time.sleep(2)
-    # if year<1971:
-
-    # elif year>=1971 or year<2016:
-    
-    # else:
-
-
     return df
 
 #load the players for that specific year and drop the rank column

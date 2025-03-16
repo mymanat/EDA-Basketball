@@ -451,15 +451,6 @@ else:
     game_evolution_df = pd.DataFrame({'Year': year_list, 'PPG': ppg_list, '2P': two_point_list, '2PA': two_point_attempt_list, '2P%': two_point_percentage_list, '3P': three_point_list, '3PA': three_point_attempt_list, '3P%': three_point_percentage_list, 'FT': free_throw_list, 'FTA': free_throw_attempt_list, 'FT%': free_throw_percentage_list, 'TRB': total_rebound_list, 'AST': assist_list, 'STL': steal_list, 'BLK': block_list})
     game_evolution_df.to_csv(game_evolution_csv, index=False)
 
-#highest correlation with winrate
-# if st.button('Correlation Heatmap'):
-#     st.header(f'Correlation Heatmap of the {selected_year} NBA Teams statistics')
-#     all_teams_stats_numeric = all_teams_stats.select_dtypes(include=['number'])
-#     corr = all_teams_stats_numeric.corr()
-#     fig, ax = plt.subplots()
-#     plot = sns.heatmap(corr, cmap='coolwarm')
-#     st.pyplot(fig)
-
 #plot the evolution of PPG
 fig, ax= plt.subplots(figsize=(10, 6))
 ax.plot(game_evolution_df['Year'], game_evolution_df['PPG'], color='skyblue', linestyle='-')

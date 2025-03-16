@@ -42,9 +42,6 @@ else:
 
 st.dataframe(mvpdf.drop(columns=['Rk']))
 
-#players with multiple mvps
-print(mvpdf['Player'].value_counts())
-
 rows=st.columns(2)
 #visualize how many games were played by all MVPs during their respective seasons
 fig, ax = plt.subplots(figsize=(10, 5))
