@@ -87,7 +87,7 @@ def get_html(url):
     return res
 
 st.set_page_config(page_title='Basketball Statistics Explorer', layout='wide')
-st.title('Basketball Statistics Explorer')
+st.title('MVP Classifier')
 
 #function toload all the players froma  specific year with their team stats
 @st.cache_data
@@ -103,10 +103,6 @@ def player_stats():
     df= df[df['Player'].str.contains('League Average') == False]
     return df
 
-df1 = player_stats()
-st.title('Player stats per game')
-st.dataframe(df1)
-
 @st.cache_data
 def player_advanced_stats():
     players = []
@@ -119,17 +115,6 @@ def player_advanced_stats():
     df = pd.concat(players, ignore_index=True).drop('Rk', axis=1)
     df= df[df['Player'].str.contains('League Average') == False]
     return df.drop(['Age', 'Pos', 'G', 'MP', 'GS', 'Awards'], axis=1)
-
-df2 = player_advanced_stats()
-st.title('Player advanced stats per game')
-st.dataframe(df2)
-
-df_players_combined = pd.merge(df1, df2, on=['Year', 'Player', 'Team'], how='inner')
-df_players_combined['Team'] = df_players_combined['Team'].map(team_mapping)
-df_players_combined.rename(columns={col: f'Player-{col}' for col in df_players_combined.columns.to_list()[4:]}, inplace=True)
-st.title('Player stats per game + advanced stats per game')
-st.dataframe(df_players_combined)
-
 
 @st.cache_data
 def team_stats():
@@ -151,10 +136,6 @@ def team_stats():
     df= df[df['Team'].str.contains('League Average') == False]
     df['Team']= df['Team'].str.replace('*','', regex=False)
     return df
-
-df3 = team_stats()
-st.title('Team stats per game')
-st.dataframe(df3)
 
 @st.cache_data
 def team_advanced_stats():
@@ -185,55 +166,75 @@ def team_advanced_stats():
     df.drop(['Arena', 'Attend.', 'Attend./G'], axis=1, inplace=True)
     return df
 
-df4 = team_advanced_stats()
-st.title('Team advanced stats per game')
-st.dataframe(df4)
+all_seasons_players_csv ='all_seasons_players.csv'
+if os.path.exists(all_seasons_players_csv):
+    all_seasons_players = pd.read_csv(all_seasons_players_csv)
+else:
+    df1 = player_stats()
+    df2 = player_advanced_stats()
+    df_players_combined = pd.merge(df1, df2, on=['Year', 'Player', 'Team'], how='inner')
+    df_players_combined['Team'] = df_players_combined['Team'].map(team_mapping)
+    df_players_combined.rename(columns={col: f'Player-{col}' for col in df_players_combined.columns.to_list()[4:]}, inplace=True)
+    df3 = team_stats()
+    df4 = team_advanced_stats()
+    df4 = team_advanced_stats()
 
-df_teams_combined = pd.merge(df3, df4, on=['Year', 'Team'], how='inner')
-df_teams_combined.rename(columns={col: f'Team-{col}' for col in df_teams_combined.columns.to_list()[2:]}, inplace=True)
-st.title('Team stats per game + advanced stats per game')
-st.dataframe(df_teams_combined)
+    df_teams_combined = pd.merge(df3, df4, on=['Year', 'Team'], how='inner')
+    df_teams_combined.rename(columns={col: f'Team-{col}' for col in df_teams_combined.columns.to_list()[2:]}, inplace=True)
 
-df_teams_players_combined = pd.merge(df_players_combined, df_teams_combined, on=['Year', 'Team'], how='inner')
-st.title('Player all stats + Team all stats')
-st.dataframe(df_teams_players_combined)
+    df_teams_players_combined = pd.merge(df_players_combined, df_teams_combined, on=['Year', 'Team'], how='inner')
 
-missing_players_teams = df_players_combined[~df_players_combined.set_index(['Year', 'Team']).index.isin(
-    df_teams_players_combined.set_index(['Year', 'Team']).index
-)]
+    missing_players_teams = df_players_combined[~df_players_combined.set_index(['Year', 'Team']).index.isin(
+        df_teams_players_combined.set_index(['Year', 'Team']).index
+    )]
 
-st.dataframe(missing_players_teams)
+    new_df = pd.merge(df_teams_players_combined, missing_players_teams, how='outer')
 
-new_df = pd.merge(df_teams_players_combined, missing_players_teams, how='outer')
+    for index,row in missing_players_teams.iterrows():
+        year = row['Year']
+        player = row['Player']
+        team = row['Team']
 
-for index,row in missing_players_teams.iterrows():
-    year = row['Year']
-    player = row['Player']
-    team = row['Team']
+        player_rows = new_df[(new_df['Year']==year)&(new_df['Player']==player)&(~new_df['Team'].isin(['2TM', '3TM', '4TM', '5TM']))]
 
-    player_rows = new_df[(new_df['Year']==year)&(new_df['Player']==player)&(~new_df['Team'].isin(['2TM', '3TM', '4TM', '5TM']))]
+        if not player_rows.empty:
+            games = pd.to_numeric(player_rows['Player-G'], errors='coerce')
+            if games.sum() == 0:
+                continue
+            weights = games / games.sum()
 
-    if not player_rows.empty:
-        games = pd.to_numeric(player_rows['Player-G'], errors='coerce')
-        if games.sum() == 0:
-            continue
-        weights = games / games.sum()
+            team_stat_cols = [col for col in new_df.columns if col.startswith('Team-')]
 
-        team_stat_cols = [col for col in new_df.columns if col.startswith('Team-')]
+            numeric_stats = player_rows[team_stat_cols].apply(pd.to_numeric, errors='coerce')
+            weighted_avg = (numeric_stats.T * weights).T.sum().round(3)
 
-        numeric_stats = player_rows[team_stat_cols].apply(pd.to_numeric, errors='coerce')
-        weighted_avg = (numeric_stats.T * weights).T.sum()
+            for col in team_stat_cols:
+                new_df.loc[(new_df['Year']==year) & (new_df['Player']==player) & (new_df['Team']==team), col] = weighted_avg[col]
 
-        for col in team_stat_cols:
-            new_df.loc[(new_df['Year']==year) & (new_df['Player']==player) & (new_df['Team']==team), col] = weighted_avg[col]
+    new_df['Player-Awards'] = new_df['Player-Awards'].fillna('').astype(str)
+    new_df['MVP'] = new_df['Player-Awards'].apply(lambda x: 1 if 'MVP-1' in x.split(',') else 0)
+    new_df.to_csv(all_seasons_players_csv, index=False)
 
+st.title("All players since 1956")
+st.dataframe(all_seasons_players)
 
-new_df['Player-Awards'] = new_df['Player-Awards'].fillna('').astype(str)
-new_df['MVP'] = new_df['Player-Awards'].apply(lambda x: 1 if 'MVP-1' in x.split(',') else 0)
+X = all_seasons_players.drop(['Player', 'Age', 'Team', 'Player-Pos', 'Player-Awards', 'MVP'], axis=1)
+y = all_seasons_players['MVP']
 
-st.title("NEW DF")
-st.dataframe(new_df)
+from sklearn.model_selection import train_test_split
 
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.3, random_state=101)
 
+from sklearn.ensemble import HistGradientBoostingClassifier
+
+model = HistGradientBoostingClassifier()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+print(classification_report(y_test, predictions))
+print(confusion_matrix(y_test, predictions))
+print(accuracy_score(y_test, predictions))
 
 
