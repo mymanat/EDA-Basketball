@@ -218,23 +218,117 @@ else:
 st.title("All players since 1956")
 st.dataframe(all_seasons_players)
 
-X = all_seasons_players.drop(['Player', 'Age', 'Team', 'Player-Pos', 'Player-Awards', 'MVP'], axis=1)
-y = all_seasons_players['MVP']
+trying = all_seasons_players[all_seasons_players['Year'] >= 1980].drop(['Player', 'Age', 'Team', 'Player-Pos', 'Player-Awards', 'Player-GS', 'Team-MP'], axis=1).reset_index(drop=True)
+for i in range(0, len(trying)):
+    if trying.loc[i, 'Player-FGA'] == 0:
+        trying.loc[i, 'Player-FG%'] = 0
+        trying.loc[i, 'Player-eFG%'] = 0
+        trying.loc[i, 'Player-FTr'] = 0
+        trying.loc[i, 'Player-3PAr'] = 0
+    if trying.loc[i, 'Player-2PA'] == 0:
+        trying.loc[i, 'Player-2P%'] = 0
+    if trying.loc[i, 'Player-3PA'] == 0:
+        trying.loc[i, 'Player-3P%'] = 0
+    if trying.loc[i, 'Player-FTA'] == 0:
+        trying.loc[i, 'Player-FT%'] = 0
+    if trying.loc[i, 'Player-FGA'] == 0 or trying.loc[i, 'Player-FTA'] == 0:
+        trying.loc[i, 'Player-TS%'] = 0
+    if (trying.loc[i, 'Player-FGA'] == 0) and (trying.loc[i, 'Player-FTA'] == 0) and (trying.loc[i, 'Player-TOV'] == 0):
+        trying.loc[i, 'Player-TOV%'] = 0
+    if trying.loc[i, 'Player-MP'] == 0:
+        trying.loc[i, 'Player-PER'] = 0
+        trying.loc[i, 'Player-WS/48'] = 0
+        trying.loc[i, 'Player-AST%'] = 0
+        trying.loc[i, 'Player-STL%'] = 0
+        trying.loc[i, 'Player-TRB%'] = 0
+        trying.loc[i, 'Player-ORB%'] = 0
+        trying.loc[i, 'Player-DRB%'] = 0
+        trying.loc[i, 'Player-BLK%'] = 0
+        trying.loc[i, 'Player-OBPM'] = 0
+        trying.loc[i, 'Player-DBPM'] = 0
+        trying.loc[i, 'Player-BPM'] = 0
+        trying.loc[i, 'Player-USG%'] = 0
+        trying.loc[i, 'Player-VORP'] = 0
+
+
+st.dataframe(trying)
+
+X = trying.drop(['MVP'], axis=1)
+y = trying['MVP']
 
 from sklearn.model_selection import train_test_split
-
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.3, random_state=101)
-
-from sklearn.ensemble import HistGradientBoostingClassifier
-
-model = HistGradientBoostingClassifier()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
+#LOGISTIC REGRESSION
+from sklearn.linear_model import LogisticRegression
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state=101, stratify=y)
+model = LogisticRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+print("Logistic Regression")
 print(classification_report(y_test, predictions))
 print(confusion_matrix(y_test, predictions))
-print(accuracy_score(y_test, predictions))
 
+#RANDOM FOREST CLASSIFIER
+from sklearn.ensemble import RandomForestClassifier
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state=101)
+rfc = RandomForestClassifier(n_estimators=800)
+rfc.fit(X_train, y_train)
+rfc_pred = rfc.predict(X_test)
+print("Random Forest Classifier")
+print(classification_report(y_test, rfc_pred))
+print(confusion_matrix(y_test, rfc_pred))
+
+#SVC
+from sklearn.svm import SVC
+model_svc = SVC()
+model_svc.fit(X_train,y_train)
+svc_pred = model.predict(X_test)
+print("SVC")
+print(classification_report(y_test, svc_pred))
+print(confusion_matrix(y_test, svc_pred))
+
+#XGBOOST
+from xgboost import XGBClassifier
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state=101)
+xgb_model = XGBClassifier()
+xgb_model.fit(X_train, y_train)
+xgb_predict = xgb_model.predict(X_test)
+print("XGB Classifier")
+print(classification_report(y_test, xgb_predict))
+print(confusion_matrix(y_test, xgb_predict))
+
+#OVERSAMPLING
+from imblearn.over_sampling import SMOTE
+smote = SMOTE(random_state=101)
+X_smote, y_smote = smote.fit_resample(X,y)
+X_train, X_test, y_train, y_test = train_test_split(X_smote,y_smote,test_size=0.2, random_state=101)
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+print("Logistic Regression after over-sampling")
+print(classification_report(y_test, predictions))
+print(confusion_matrix(y_test, predictions))
+
+rfc = RandomForestClassifier(n_estimators=300)
+rfc.fit(X_train, y_train)
+rfc_pred = rfc.predict(X_test)
+print("Random Forest Classifier after over-sampling")
+print(classification_report(y_test, rfc_pred))
+print(confusion_matrix(y_test, rfc_pred))
+
+model_svc = SVC()
+model_svc.fit(X_train,y_train)
+svc_pred = model.predict(X_test)
+print("SVC after over-sampling")
+print(classification_report(y_test, svc_pred))
+print(confusion_matrix(y_test, svc_pred))
+
+xgb_model = XGBClassifier()
+xgb_model.fit(X_train, y_train)
+xgb_predict = xgb_model.predict(X_test)
+print("XGB Classifier after over-sampling")
+print(classification_report(y_test, xgb_predict))
+print(confusion_matrix(y_test, xgb_predict))
 
