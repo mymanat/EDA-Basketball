@@ -89,11 +89,11 @@ def get_html(url):
 st.set_page_config(page_title='Basketball Statistics Explorer', layout='wide')
 st.title('MVP Classifier')
 
-#function toload all the players froma  specific year with their team stats
+#function toload all the players from a specific year with their team stats
 @st.cache_data
-def player_stats():
+def player_stats(start_year, end_year):
     players = []
-    for i in range(1956,2025):
+    for i in range(start_year,end_year+1):
         url = "https://www.basketball-reference.com/leagues/NBA_" + str(i) + "_per_game.html"
         html = pd.read_html(get_html(url), header = 0)
         time.sleep(2)
@@ -104,9 +104,9 @@ def player_stats():
     return df
 
 @st.cache_data
-def player_advanced_stats():
+def player_advanced_stats(start_year,end_year):
     players = []
-    for i in range(1956,2025):
+    for i in range(start_year,end_year+1):
         url = "https://www.basketball-reference.com/leagues/NBA_" + str(i) + "_advanced.html"
         html = pd.read_html(get_html(url), header = 0)
         time.sleep(2)
@@ -117,9 +117,9 @@ def player_advanced_stats():
     return df.drop(['Age', 'Pos', 'G', 'MP', 'GS', 'Awards'], axis=1)
 
 @st.cache_data
-def team_stats():
+def team_stats(start_year,end_year):
     teams = []
-    for i in range(1956,2025):
+    for i in range(start_year,end_year+1):
         url = "https://www.basketball-reference.com/leagues/NBA_" + str(i) + ".html"
         html = pd.read_html(get_html(url), header = 0)
         time.sleep(2)
@@ -138,9 +138,9 @@ def team_stats():
     return df
 
 @st.cache_data
-def team_advanced_stats():
+def team_advanced_stats(start_year,end_year):
     teams = []
-    for i in range(1956,2025):
+    for i in range(start_year,end_year+1):
         url = "https://www.basketball-reference.com/leagues/NBA_" + str(i) + ".html"
         html = pd.read_html(get_html(url), header = 0)
         time.sleep(2)
@@ -170,14 +170,14 @@ all_seasons_players_csv ='all_seasons_players.csv'
 if os.path.exists(all_seasons_players_csv):
     all_seasons_players = pd.read_csv(all_seasons_players_csv)
 else:
-    df1 = player_stats()
-    df2 = player_advanced_stats()
+    df1 = player_stats(1956,2024)
+    df2 = player_advanced_stats(1956,2024)
     df_players_combined = pd.merge(df1, df2, on=['Year', 'Player', 'Team'], how='inner')
     df_players_combined['Team'] = df_players_combined['Team'].map(team_mapping)
     df_players_combined.rename(columns={col: f'Player-{col}' for col in df_players_combined.columns.to_list()[4:]}, inplace=True)
-    df3 = team_stats()
-    df4 = team_advanced_stats()
-    df4 = team_advanced_stats()
+    df3 = team_stats(1956,2024)
+    df4 = team_advanced_stats(1956,2024)
+    df4 = team_advanced_stats(1956,2024)
 
     df_teams_combined = pd.merge(df3, df4, on=['Year', 'Team'], how='inner')
     df_teams_combined.rename(columns={col: f'Team-{col}' for col in df_teams_combined.columns.to_list()[2:]}, inplace=True)
@@ -257,7 +257,7 @@ X = trying.drop(['MVP'], axis=1)
 y = trying['MVP']
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+from sklearn.metrics import classification_report, confusion_matrix
 
 #LOGISTIC REGRESSION
 from sklearn.linear_model import LogisticRegression
@@ -318,7 +318,7 @@ print("Random Forest Classifier after over-sampling")
 print(classification_report(y_test, rfc_pred))
 print(confusion_matrix(y_test, rfc_pred))
 
-model_svc = SVC()
+model_svc = SVC(probability=True)
 model_svc.fit(X_train,y_train)
 svc_pred = model.predict(X_test)
 print("SVC after over-sampling")
@@ -332,3 +332,105 @@ print("XGB Classifier after over-sampling")
 print(classification_report(y_test, xgb_predict))
 print(confusion_matrix(y_test, xgb_predict))
 
+#Creating DF for current season
+df1 = player_stats(2025,2025)
+df2 = player_advanced_stats(2025,2025)
+df_players_combined = pd.merge(df1, df2, on=['Year', 'Player', 'Team'], how='inner')
+df_players_combined['Team'] = df_players_combined['Team'].map(team_mapping)
+df_players_combined.rename(columns={col: f'Player-{col}' for col in df_players_combined.columns.to_list()[4:]}, inplace=True)
+df3 = team_stats(2025,2025)
+df4 = team_advanced_stats(2025,2025)
+df4 = team_advanced_stats(2025,2025)
+
+df_teams_combined = pd.merge(df3, df4, on=['Year', 'Team'], how='inner')
+df_teams_combined.rename(columns={col: f'Team-{col}' for col in df_teams_combined.columns.to_list()[2:]}, inplace=True)
+
+df_teams_players_combined = pd.merge(df_players_combined, df_teams_combined, on=['Year', 'Team'], how='inner')
+
+missing_players_teams = df_players_combined[~df_players_combined.set_index(['Year', 'Team']).index.isin(
+    df_teams_players_combined.set_index(['Year', 'Team']).index
+)]
+
+new_df = pd.merge(df_teams_players_combined, missing_players_teams, how='outer')
+
+for index,row in missing_players_teams.iterrows():
+    year = row['Year']
+    player = row['Player']
+    team = row['Team']
+
+    player_rows = new_df[(new_df['Year']==year)&(new_df['Player']==player)&(~new_df['Team'].isin(['2TM', '3TM', '4TM', '5TM']))]
+
+    if not player_rows.empty:
+        games = pd.to_numeric(player_rows['Player-G'], errors='coerce')
+        if games.sum() == 0:
+            continue
+        weights = games / games.sum()
+
+        team_stat_cols = [col for col in new_df.columns if col.startswith('Team-')]
+
+        numeric_stats = player_rows[team_stat_cols].apply(pd.to_numeric, errors='coerce')
+        weighted_avg = (numeric_stats.T * weights).T.sum().round(3)
+
+        for col in team_stat_cols:
+            new_df.loc[(new_df['Year']==year) & (new_df['Player']==player) & (new_df['Team']==team), col] = weighted_avg[col]
+
+current = new_df.drop(['Player', 'Age', 'Team', 'Player-Pos', 'Player-Awards', 'Player-GS', 'Team-MP'], axis=1).reset_index(drop=True)
+for i in range(0, len(current)):
+    if current.loc[i, 'Player-FGA'] == 0:
+        current.loc[i, 'Player-FG%'] = 0
+        current.loc[i, 'Player-eFG%'] = 0
+        current.loc[i, 'Player-FTr'] = 0
+        current.loc[i, 'Player-3PAr'] = 0
+    if current.loc[i, 'Player-2PA'] == 0:
+        current.loc[i, 'Player-2P%'] = 0
+    if current.loc[i, 'Player-3PA'] == 0:
+        current.loc[i, 'Player-3P%'] = 0
+    if current.loc[i, 'Player-FTA'] == 0:
+        current.loc[i, 'Player-FT%'] = 0
+    if current.loc[i, 'Player-FGA'] == 0 or current.loc[i, 'Player-FTA'] == 0:
+        current.loc[i, 'Player-TS%'] = 0
+    if (current.loc[i, 'Player-FGA'] == 0) and (current.loc[i, 'Player-FTA'] == 0) and (current.loc[i, 'Player-TOV'] == 0):
+        current.loc[i, 'Player-TOV%'] = 0
+    if current.loc[i, 'Player-MP'] == 0:
+        current.loc[i, 'Player-PER'] = 0
+        current.loc[i, 'Player-WS/48'] = 0
+        current.loc[i, 'Player-AST%'] = 0
+        current.loc[i, 'Player-STL%'] = 0
+        current.loc[i, 'Player-TRB%'] = 0
+        current.loc[i, 'Player-ORB%'] = 0
+        current.loc[i, 'Player-DRB%'] = 0
+        current.loc[i, 'Player-BLK%'] = 0
+        current.loc[i, 'Player-OBPM'] = 0
+        current.loc[i, 'Player-DBPM'] = 0
+        current.loc[i, 'Player-BPM'] = 0
+        current.loc[i, 'Player-USG%'] = 0
+        current.loc[i, 'Player-VORP'] = 0
+
+st.write("Current Season")
+st.dataframe(current)
+
+current_reordered = current[['Year', 'Player-G', 'Player-MP', 'Player-FG', 'Player-FGA', 'Player-FG%', 
+                'Player-FT', 'Player-FTA', 'Player-FT%', 'Player-TRB', 'Player-AST', 'Player-PF', 
+                'Player-PTS', 'Player-ORB', 'Player-DRB', 'Player-STL', 'Player-BLK', 'Player-TOV', 
+                'Player-3P', 'Player-3PA', 'Player-3P%', 'Player-2P', 'Player-2PA', 'Player-2P%', 
+                'Player-eFG%', 'Player-PER', 'Player-TS%', 'Player-FTr', 'Player-OWS', 'Player-DWS', 
+                'Player-WS', 'Player-WS/48', 'Player-AST%', 'Player-TRB%', 'Player-ORB%', 'Player-DRB%', 
+                'Player-STL%', 'Player-BLK%', 'Player-OBPM', 'Player-DBPM', 'Player-BPM', 'Player-VORP', 
+                'Player-TOV%', 'Player-USG%', 'Player-3PAr', 'Team-G', 'Team-FG', 'Team-FGA', 'Team-FG%', 
+                'Team-3P', 'Team-3PA', 'Team-3P%', 'Team-2P', 'Team-2PA', 'Team-2P%', 'Team-FT', 
+                'Team-FTA', 'Team-FT%', 'Team-ORB', 'Team-DRB', 'Team-TRB', 'Team-AST', 'Team-STL', 
+                'Team-BLK', 'Team-TOV', 'Team-PF', 'Team-PTS', 'Team-Rk', 'Team-Age', 'Team-W', 
+                'Team-L', 'Team-PW', 'Team-PL', 'Team-MOV', 'Team-SOS', 'Team-SRS', 'Team-ORtg', 
+                'Team-DRtg', 'Team-NRtg', 'Team-Pace', 'Team-FTr', 'Team-3PAr', 'Team-TS%', 'Team-eFG%_O', 
+                'Team-TOV%_O', 'Team-ORB%_O', 'Team-FG/FGA_O', 'Team-eFG%_D', 'Team-TOV%_D', 
+                'Team-ORB%_D', 'Team-FG/FGA_D']]
+current_reordered = current_reordered.apply(pd.to_numeric, errors='coerce')
+st.dataframe(current_reordered)
+pred_2025 = model_svc.predict(current_reordered)
+prob_2025 = model_svc.predict_proba(current_reordered)[:,1]
+st.write("Number of MVP predictions:", sum(pred_2025))
+
+current_reordered['MVP Prediction'] = pred_2025
+current_reordered['MVP Prediction Probability'] = prob_2025
+top_mvp_candidates = current_reordered.sort_values(by='MVP Prediction Probability', ascending=False ).head(20)
+st.dataframe(top_mvp_candidates)
