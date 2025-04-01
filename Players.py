@@ -8,7 +8,6 @@ import base64
 from urllib.request import Request, urlopen
 import time
 
-
 def get_html(url):
     req = Request(url, headers={ 'User-Agent': 'Mozilla/5.0'})
     res = urlopen(req)
@@ -25,7 +24,6 @@ selected_year = st.sidebar.selectbox('Year', list(reversed(range(1950,2025))))
 def load_data(year):
     url = "https://www.basketball-reference.com/leagues/NBA_" + str(year) + "_per_game.html"
     html = pd.read_html(get_html(url), header = 0)
-    time.sleep(2)
     df = html[0]
     return df
 
@@ -36,55 +34,42 @@ df_players = df_players.drop(columns=['Rk'])
 #function to load the mvp for that year
 @st.cache_data
 def load_mvp(df):
-    df['Awards'] = df['Awards'].fillna('', inplace=False)
-    for j in range(0, len(df['Awards'])):
-        flag = any(x=='MVP-1' for x in df.iloc[j]['Awards'].split(','))
-        if flag: 
-            return df.iloc[j]
+    df['Awards'] = df['Awards'].fillna('')
+    return df[df['Awards'].str.contains(r'\bMVP-1\b')]
 
 #load the mvp for that year and create a dataframe of that mvp series
-mvp = load_mvp(df_players)
-df_mvp = pd.DataFrame([mvp], index=[0])
+df_mvp = load_mvp(df_players)
+df_mvp.reset_index(drop=True, inplace=True)
 
 #functio to load the defensive player of the year for that year
 @st.cache_data
 def load_dpoy(df):
-    df['Awards'] = df['Awards'].fillna('', inplace=False)
-    for j in range(0, len(df['Awards'])):
-        flag = any(x=='DPOY-1' for x in df.iloc[j]['Awards'].split(','))
-        if flag: 
-            return df.iloc[j]
+    df['Awards'] = df['Awards'].fillna('')
+    return df[df['Awards'].str.contains(r'\bDPOY-1\b')]
 
 #load the dpoy for that year and create a dataframe of that dpoy series   
-dpoy = load_dpoy(df_players)
-df_dpoy = pd.DataFrame([dpoy], index=[0])
+df_dpoy = load_dpoy(df_players)
+df_dpoy.reset_index(drop=True, inplace=True)
 
 #function to load the rookie of the year for that year
 @st.cache_data
 def load_roy(df):
-    df['Awards'] = df['Awards'].fillna('', inplace=False)
-    for j in range(0, len(df['Awards'])):
-        flag = any(x=='ROY-1' for x in df.iloc[j]['Awards'].split(','))
-        if flag: 
-            return df.iloc[j]
+    df['Awards'] = df['Awards'].fillna('')
+    return df[df['Awards'].str.contains(r'\bROY-1\b')]
 
 #load the roy for that year and create a dataframe of that roy series       
-roy = load_roy(df_players)
-df_roy = pd.DataFrame([roy], index=[0])
+df_roy = load_roy(df_players)
+df_roy.reset_index(drop=True, inplace=True)
 
 #function to load the all stars for that year
 @st.cache_data
 def load_as(df):
-    asList = []
-    df['Awards'] = df['Awards'].fillna('', inplace=False)
-    for j in range(0, len(df['Awards'])):
-        if 'AS' in df.iloc[j]['Awards']: 
-            asList.append(df.iloc[j])
-    as_df = pd.DataFrame(asList, index=range(len(asList)))
-    return as_df
+    df['Awards'] = df['Awards'].fillna('')
+    return df[df['Awards'].str.contains(r'\bAS\b')]
 
 #load the all stars for that year
 as_df = load_as(df_players)
+as_df.reset_index(drop=True, inplace=True)
 
 #all the players of that season
 st.header(f'**Players of the {selected_year} season**')
@@ -172,7 +157,7 @@ ax5.bar(all_stats.index, all_stats, color='orange', label='All Players')
 ax5.set_ylabel('Average per game')
 ax5.set_xlabel('Statistics')
 ax5.xaxis.set_tick_params(rotation=90)
-ax5.set_title(f'Average  per game statistics of the {selected_year} ROY vs {selected_year} All Players')
+ax5.set_title(f'Average per game statistics of the {selected_year} ROY vs {selected_year} All Players')
 ax5.legend()
 st.pyplot(fig5)
 
