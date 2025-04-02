@@ -4,9 +4,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import base64
 from urllib.request import Request, urlopen
-import time
+
 
 
 def get_html(url):
