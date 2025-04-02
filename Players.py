@@ -39,7 +39,7 @@ def load_mvp(df):
 df_mvp = load_mvp(df_players)
 df_mvp.reset_index(drop=True, inplace=True)
 
-#functio to load the defensive player of the year for that year
+#function to load the defensive player of the year for that year
 @st.cache_data
 def load_dpoy(df):
     df['Awards'] = df['Awards'].fillna('')

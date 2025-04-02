@@ -56,7 +56,7 @@ else:
 team2 = st.header("Second Team selected:")
 selected_year2 = st.selectbox('Year2', list(reversed(range(1950,2025))))
 
-if(selected_year2 < 1971):
+if selected_year2 < 1971:
     df1 = load_teams(selected_year2)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
     df2 = load_teams(selected_year2)[1].loc[lambda d: pd.to_numeric(d['Rk'], errors='coerce').notna()]
     selected_team2 = st.selectbox('Team2', df2['Team'])
