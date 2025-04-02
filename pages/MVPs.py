@@ -67,31 +67,6 @@ ax1.set_ylabel('Number of MVPs')
 ax1.set_xlabel('Position')
 st.pyplot(fig1)
 
-
-#ML model to predict the season MVP
-
-#load a csv file with all the players from all the seasons and add a new column called mvp with 0 or 1
-# @st.cache_data
-# def load_players():
-#     players_perseason = []
-#     for i in range(1950,2025):
-#         url = "https://www.basketball-reference.com/leagues/NBA_" + str(i) + "_per_game.html"
-#         html = pd.read_html(get_html(url), header = 0)
-#         time.sleep(2)
-#         df = html[0]
-#         df['Awards'] = df['Awards'].fillna('', inplace=False)
-#         for j in range(0, len(df['Awards'])):
-#             flag = any(x=='MVP-1' for x in df.iloc[j]['Awards'].split(','))
-#             if flag:
-#                 df['MVP'] = 1
-#             else:
-#                 df['MVP'] = 0
-#         players_perseason.append(df)
-#     all_players_df = pd.DataFrame(players_perseason)
-#     return all_players_df
-
-# all_players_df = load_players()
-# print(all_players_df.head(5))
                 
 
 
