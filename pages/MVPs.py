@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from urllib.request import Request, urlopen
 import time
-
+from constants import FIRST_YEAR_NBA, FIRST_YEAR_MVP, CURRENT_YEAR, PREVIOUS_YEAR
 def get_html(url):
     req = Request(url, headers={ 'User-Agent': 'Mozilla/5.0'})
     res = urlopen(req)
@@ -18,7 +18,7 @@ st.title('Basketball MVP Stats Explorer')
 @st.cache_data
 def load_data():
     mvp_rows=[]
-    for i in range (1950, 2025):
+    for i in range (FIRST_YEAR_NBA, PREVIOUS_YEAR+1):
         url = "https://www.basketball-reference.com/leagues/NBA_" + str(i) + "_per_game.html"
         html = pd.read_html(get_html(url), header = 0)
         time.sleep(2)

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from urllib.request import Request, urlopen
 import time
+from constants import FIRST_YEAR_NBA, FIRST_YEAR_MVP, CURRENT_YEAR, PREVIOUS_YEAR
 
 
 def get_html(url):
@@ -15,7 +16,7 @@ def get_html(url):
 st.set_page_config(page_title='Basketball Stats Explorer', layout='wide')
 st.title('Basketball Stats Explorer')
 team1 = st.header("First Team selected:")
-selected_year = st.selectbox('Year1', list(reversed(range(1950,2025))))
+selected_year = st.selectbox('Year1', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
 
 #load all the players
 @st.cache_data
@@ -26,7 +27,7 @@ def load_teams(year):
     return html
 
 #load the data and remove the divisions in the rows
-if(selected_year < 1971):
+if selected_year < 1971:
     df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
     df2 = load_teams(selected_year)[1].loc[lambda d: pd.to_numeric(d['Rk'], errors='coerce').notna()]
     selected_team1 = st.selectbox('Team1', df2['Team'])
@@ -54,7 +55,7 @@ else:
     selected_team1_stats2 = df3.loc[df3['Team'] == selected_team1]
 
 team2 = st.header("Second Team selected:")
-selected_year2 = st.selectbox('Year2', list(reversed(range(1950,2025))))
+selected_year2 = st.selectbox('Year2', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
 
 if selected_year2 < 1971:
     df1 = load_teams(selected_year2)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
