@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from urllib.request import Request, urlopen
 import time
-from constants import FIRST_YEAR_NBA, FIRST_YEAR_MVP, CURRENT_YEAR, PREVIOUS_YEAR
+from src.constants import FIRST_YEAR_NBA, FIRST_YEAR_MVP, CURRENT_YEAR, PREVIOUS_YEAR
+
 def get_html(url):
     req = Request(url, headers={ 'User-Agent': 'Mozilla/5.0'})
     res = urlopen(req)
