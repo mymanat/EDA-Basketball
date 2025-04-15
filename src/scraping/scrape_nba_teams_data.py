@@ -1,15 +1,11 @@
 import os
 import streamlit as st
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from urllib.request import Request, urlopen
 import time
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-
-from src.constants import TEAM_MAPPING, FIRST_YEAR_MVP, CURRENT_YEAR, PREVIOUS_YEAR
+from src.constants import TEAM_MAPPING, FIRST_YEAR_MVP, PREVIOUS_YEAR
 
 def get_html(url):
     req = Request(url, headers={ 'User-Agent': 'Mozilla/5.0'})

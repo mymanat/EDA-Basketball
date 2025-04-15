@@ -1,13 +1,11 @@
 import os
 import streamlit as st
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from urllib.request import Request, urlopen
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-
 from src.constants import PREVIOUS_YEAR, FIRST_YEAR_NBA
 
 def get_html(url):

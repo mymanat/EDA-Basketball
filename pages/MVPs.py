@@ -1,23 +1,13 @@
-import os
 import streamlit as st
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from urllib.request import Request, urlopen
-import time
-from src.constants import FIRST_YEAR_NBA, FIRST_YEAR_MVP, CURRENT_YEAR, PREVIOUS_YEAR
-
-def get_html(url):
-    req = Request(url, headers={ 'User-Agent': 'Mozilla/5.0'})
-    res = urlopen(req)
-    return res
 
 st.title('Basketball MVP Stats Explorer')
 
 df = pd.read_csv('data/raw/all_seasons_players.csv')
 
-mvpdf = df[df['Player-Awards'].fillna('').str.contains(r'MVP-1(,|$)', regex=True)].set_index('Year')
+mvpdf = df[df['Player-Awards'].fillna('').str.contains(r'\bMVP-1\b')].set_index('Year')
 
 st.dataframe(mvpdf)
 

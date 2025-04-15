@@ -1,10 +1,12 @@
+import os
 import streamlit as st
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from urllib.request import Request, urlopen
-
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from src.constants import PREVIOUS_YEAR, FIRST_YEAR_NBA
 
 def get_html(url):
     req = Request(url, headers={ 'User-Agent': 'Mozilla/5.0'})
@@ -15,7 +17,7 @@ st.set_page_config(page_title='Basketball Statistics Explorer', layout='wide')
 st.title('Basketball Statistics Explorer')
 
 #sidebar to select the year
-selected_year = st.sidebar.selectbox('Year', list(reversed(range(1950,2025))))
+selected_year = st.sidebar.selectbox('Year', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
 
 #function toload all the players froma  specific year with their team stats
 @st.cache_data
