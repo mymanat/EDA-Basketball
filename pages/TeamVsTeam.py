@@ -9,12 +9,12 @@ st.title('Basketball Stats Explorer')
 
 teamsdf = pd.read_csv('data/raw/all_seasons_teams.csv')
 
-team3 = st.header("First Team selected:")
+team1 = st.header("First Team selected:")
 selected_year1 = st.selectbox('Year1', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
 selected_team1 = st.selectbox('Team1', teamsdf[teamsdf['Year']==selected_year1]['Team'])
 selected_team1_stats = teamsdf.loc[teamsdf['Year']==selected_year1][teamsdf['Team']==selected_team1]
 
-team4 = st.header("Second Team selected:")
+team2 = st.header("Second Team selected:")
 selected_year2 = st.selectbox('Year2', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
 selected_team2 = st.selectbox('Team2', teamsdf[teamsdf['Year']==selected_year2]['Team'])
 selected_team2_stats = teamsdf.loc[teamsdf['Year']==selected_year2][teamsdf['Team']==selected_team2]
