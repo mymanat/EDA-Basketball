@@ -70,5 +70,7 @@ else:
     df1 = team_stats(FIRST_YEAR_MVP,PREVIOUS_YEAR)
     df2 = team_advanced_stats(FIRST_YEAR_MVP,PREVIOUS_YEAR)
     df_teams_combined = pd.merge(df1, df2, on=['Year', 'Team'], how='inner')
+    cols_to_multiply = ['FG%', '3P%', '2P%', 'FT%', 'TS%', 'eFG%_O', 'eFG%_D']
+    df_teams_combined[cols_to_multiply]=df_teams_combined[cols_to_multiply].multiply(100)
     #if the csv file does not exist, create it
     df_teams_combined.to_csv(all_seasons_teams_csv, index=False)

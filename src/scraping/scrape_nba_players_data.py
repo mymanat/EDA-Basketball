@@ -136,4 +136,11 @@ else:
             for col in team_stat_cols:
                 new_df.loc[(new_df['Year']==year) & (new_df['Player']==player) & (new_df['Team']==team), col] = weighted_avg[col]
 
+    cols_to_multiply = [
+        'Player-FG%', 'Player-FT%', 'Player-2P%', 'Player-3P%', 'Player-TS%', 'Player-eFG%',
+        'Team-FG%', 'Team-3P%', 'Team-2P%', 'Team-FT%', 'Team-TS%', 'Team-eFG%_O', 
+        'Team-eFG%_D'
+    ]
+    new_df[cols_to_multiply] = new_df[cols_to_multiply].multiply(100).round(3)
+
     new_df.to_csv(all_seasons_players_csv, index=False)
