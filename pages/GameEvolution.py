@@ -127,7 +127,7 @@ else:
 
 df = pd.read_csv('data/raw/all_seasons_teams.csv')
 
-grouped = df.drop('Team', axis=1).groupby('Year').mean()
+grouped = df.drop('Team', axis=1).select_dtypes(include='number').groupby('Year').mean()
 
 #plot the evolution of PPG
 fig, ax= plt.subplots(figsize=(10, 6))
