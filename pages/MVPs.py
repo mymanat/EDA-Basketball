@@ -36,6 +36,29 @@ ax1.set_ylabel('Number of MVPs')
 ax1.set_xlabel('Position')
 st.pyplot(fig1)        
 
+test = pd.read_csv('data/raw/all_seasons_players.csv')
+
+newtest = test[test['Player']=='Stephen Curry']
+
+st.dataframe(newtest)
+
+st.write('Number of seasons in the NBA:', newtest['Year'].nunique())
+st.write('Average PTS per game all time: ', newtest['Player-PTS'].mean())
+st.write('Average AST per game all time: ', newtest['Player-AST'].mean())
+st.write('Average TRB per game all time: ', newtest['Player-TRB'].mean())
+st.write('Average 2P per game all time: ', newtest['Player-2P'].mean())
+st.write('Average 3P per game all time: ', newtest['Player-3P'].mean())
+st.write('Average FT per game all time: ', newtest['Player-FT'].mean())
+st.write('Average STL per game all time: ', newtest['Player-STL'].mean())
+st.write('Average BLK per game all time: ', newtest['Player-BLK'].mean())
+
+st.write('Number of AS selections: ', newtest['Player-Awards'].str.count(r'\bAS\b').sum())
+st.write('Number of MVP Awards: ', newtest['Player-Awards'].str.count(r'\bMVP-1\b').sum())
+st.write('Number of DPOY Awards: ', newtest['Player-Awards'].str.count(r'\bDPOY-1\b').sum())
+st.write('Number of ROY Awards: ', newtest['Player-Awards'].str.count(r'\bROY-1\b').sum())
+st.write('Number of NBA First team selections : ', newtest['Player-Awards'].str.count(r'\bNBA1\b').sum())
+st.write('Number of MVP Awards: ', newtest['Player-Awards'].str.count(r'\bMVP-1\b').sum())
+st.write('Number of AS selections: ', newtest['Player-Awards'].str.count(r'\bAS\b').sum())
 
 
 

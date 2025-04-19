@@ -10,25 +10,51 @@ st.title('Basketball Stats Explorer')
 
 playersdf = pd.read_csv('data/raw/all_seasons_players.csv')
 
+#display stats for player1
 player1 = st.header("First Player selected:")
-selected_year1 = st.selectbox('Year1', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
-selected_player1 = st.selectbox('Player1', playersdf[playersdf['Year']==selected_year1]['Player'])
-selected_player1_stats = playersdf.loc[playersdf['Year']==selected_year1][playersdf['Player']==selected_player1]
+selected_year1 = st.selectbox('Year1', ['All Time']+list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
+if selected_year1 == 'All Time':
+    selected_player1 = st.selectbox('Player1', playersdf['Player'].unique())
+    selected_player1_stats = playersdf.loc[playersdf['Player']==selected_player1]
+else:
+    selected_player1 = st.selectbox('Player1', playersdf[playersdf['Year']==selected_year1]['Player'].unique())
+    selected_player1_stats = playersdf.loc[playersdf['Year']==selected_year1][playersdf['Player']==selected_player1]
 
+#display stats for player2
 player2 = st.header("Second Player selected:")
-selected_year2 = st.selectbox('Year2', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
-selected_player2 = st.selectbox('Player2', playersdf[playersdf['Year']==selected_year2]['Player'])
-selected_player2_stats = playersdf.loc[playersdf['Year']==selected_year2][playersdf['Player']==selected_player2]
+selected_year2 = st.selectbox('Year2', ['All Time']+list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
+if selected_year2 == 'All Time':
+    selected_player2 = st.selectbox('Player2', playersdf['Player'].unique())
+    selected_player2_stats = playersdf.loc[playersdf['Player']==selected_player2]
+else:
+    selected_player2 = st.selectbox('Player2', playersdf[playersdf['Year']==selected_year2]['Player'].unique())
+    selected_player2_stats = playersdf.loc[playersdf['Year']==selected_year2][playersdf['Player']==selected_player2]
 
 # create a radar chart for each player and display their respective accolades
-row = st.columns(2)
+col1, col2 = st.columns(2)
 if st.button('Compare Players'):
-    row[0].header(f'{selected_year1} {selected_player1}')
-    row[0].dataframe(selected_player1_stats)
-    df1 = pd.DataFrame(dict(
-        r=selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].values[0],
-        theta= selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
-    ))
+    with col1:
+        st.header(f'{selected_year1} {selected_player1}')
+        st.dataframe(selected_player1_stats)
+    if selected_year1 == 'All Time':
+        df1 = pd.DataFrame(dict(
+            r=selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].mean().values,
+            theta= selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
+        ))
+        df2 = pd.DataFrame(dict(
+            r=selected_player1_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].mean().values,
+            theta= selected_player1_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].columns.tolist()
+        ))
+    else:
+        df1 = pd.DataFrame(dict(
+            r=selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].values[0],
+            theta= selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
+        ))
+        df2 = pd.DataFrame(dict(
+            r=selected_player1_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].values[0],
+            theta= selected_player1_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].columns.tolist()
+        ))
+    #display first radar chart
     fig1 = px.line_polar(df1, r='r', theta='theta', line_close=True)
     fig1.update_traces(fill='toself')
     fig1.update_layout(
@@ -37,24 +63,62 @@ if st.button('Compare Players'):
             radialaxis = dict(range=[0, 5]),
         )
     )
-    row[0].plotly_chart(fig1)
-    row[0].write(selected_player1_stats['Player-Awards'])
+    with col1:
+        st.plotly_chart(fig1, use_container_width=True)
 
-    row[1].header(f'{selected_year2} {selected_player2}')
-    row[1].dataframe(selected_player2_stats)
-    df2 = pd.DataFrame(dict(
-        r=selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].values[0],
-        theta= selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
-    ))
+    #display second radar chart
     fig2 = px.line_polar(df2, r='r', theta='theta', line_close=True)
     fig2.update_traces(fill='toself')
     fig2.update_layout(
         template=None,
         polar = dict(
+            radialaxis = dict(range=[0, 100]),
+        )
+    )
+    with col1:
+        st.plotly_chart(fig2, use_container_width=True)
+        st.write(selected_player1_stats['Player-Awards'])
+
+    with col2:
+        st.header(f'{selected_year2} {selected_player2}')
+        st.dataframe(selected_player2_stats)
+    if selected_year2 == 'All Time':
+        df3 = pd.DataFrame(dict(
+            r=selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].mean().values,
+            theta= selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
+        ))
+        df4 = pd.DataFrame(dict(
+            r=selected_player2_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].mean().values,
+            theta= selected_player2_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].columns.tolist()
+        ))
+    else:
+        df3 = pd.DataFrame(dict(
+            r=selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].values[0],
+            theta= selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
+        ))
+        df4 = pd.DataFrame(dict(
+            r=selected_player2_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].values[0],
+            theta= selected_player2_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].columns.tolist()
+        ))
+    fig3 = px.line_polar(df3, r='r', theta='theta', line_close=True)
+    fig3.update_traces(fill='toself')
+    fig3.update_layout(
+        template=None,
+        polar = dict(
             radialaxis = dict(range=[0, 5])
         )
     )
-    row[1].plotly_chart(fig2)
-    row[1].write(selected_player2_stats['Player-Awards'])
+    with col2:
+        st.plotly_chart(fig3, use_container_width=True)
 
-
+    fig4 = px.line_polar(df4, r='r', theta='theta', line_close=True)
+    fig4.update_traces(fill='toself')
+    fig4.update_layout(
+        template=None,
+        polar = dict(
+            radialaxis = dict(range=[0, 100]),
+        )
+    )
+    with col2:
+        st.plotly_chart(fig4, use_container_width=True)
+        st.write(selected_player2_stats['Player-Awards'])
