@@ -141,6 +141,7 @@ else:
         'Team-FG%', 'Team-3P%', 'Team-2P%', 'Team-FT%', 'Team-TS%', 'Team-eFG%_O', 
         'Team-eFG%_D'
     ]
+    new_df[cols_to_multiply] = new_df[cols_to_multiply].apply(pd.to_numeric, errors='coerce')
     new_df[cols_to_multiply] = new_df[cols_to_multiply].multiply(100).round(3)
 
     new_df.to_csv(all_seasons_players_csv, index=False)

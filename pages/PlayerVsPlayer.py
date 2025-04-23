@@ -10,6 +10,9 @@ st.title('Basketball Stats Explorer')
 
 playersdf = pd.read_csv('data/raw/all_seasons_players.csv')
 
+volume_stats = ['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']
+efficiency_stats = ['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']
+
 #display stats for player1
 player1 = st.header("First Player selected:")
 selected_year1 = st.selectbox('Year1', ['All Time']+list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
@@ -32,28 +35,17 @@ else:
 
 # create a radar chart for each player and display their respective accolades
 col1, col2 = st.columns(2)
+
 if st.button('Compare Players'):
     with col1:
         st.header(f'{selected_year1} {selected_player1}')
         st.dataframe(selected_player1_stats)
     if selected_year1 == 'All Time':
-        df1 = pd.DataFrame(dict(
-            r=selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].mean().values,
-            theta= selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
-        ))
-        df2 = pd.DataFrame(dict(
-            r=selected_player1_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].mean().values,
-            theta= selected_player1_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].columns.tolist()
-        ))
+        df1 = pd.DataFrame(dict(r=selected_player1_stats[volume_stats].mean().values,theta= volume_stats))
+        df2 = pd.DataFrame(dict(r=selected_player1_stats[volume_stats].mean().values,theta= efficiency_stats))
     else:
-        df1 = pd.DataFrame(dict(
-            r=selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].values[0],
-            theta= selected_player1_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
-        ))
-        df2 = pd.DataFrame(dict(
-            r=selected_player1_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].values[0],
-            theta= selected_player1_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].columns.tolist()
-        ))
+        df1 = pd.DataFrame(dict(r=selected_player1_stats[volume_stats].values[0],theta= volume_stats))
+        df2 = pd.DataFrame(dict(r=selected_player1_stats[efficiency_stats].values[0],theta= efficiency_stats))
     #display first radar chart
     fig1 = px.line_polar(df1, r='r', theta='theta', line_close=True)
     fig1.update_traces(fill='toself')
@@ -82,24 +74,14 @@ if st.button('Compare Players'):
     with col2:
         st.header(f'{selected_year2} {selected_player2}')
         st.dataframe(selected_player2_stats)
+        
     if selected_year2 == 'All Time':
-        df3 = pd.DataFrame(dict(
-            r=selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].mean().values,
-            theta= selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
-        ))
-        df4 = pd.DataFrame(dict(
-            r=selected_player2_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].mean().values,
-            theta= selected_player2_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].columns.tolist()
-        ))
+        df3 = pd.DataFrame(dict(r=selected_player2_stats[volume_stats].mean().values,theta= volume_stats))
+        df4 = pd.DataFrame(dict(r=selected_player2_stats[efficiency_stats].mean().values,theta= efficiency_stats))
     else:
-        df3 = pd.DataFrame(dict(
-            r=selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].values[0],
-            theta= selected_player2_stats[['Player-PTS','Player-AST','Player-TRB','Player-2P','Player-3P','Player-FT','Player-STL','Player-BLK']].columns.tolist()
-        ))
-        df4 = pd.DataFrame(dict(
-            r=selected_player2_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].values[0],
-            theta= selected_player2_stats[['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-TS%','Player-eFG%','Player-USG%','Player-TOV%']].columns.tolist()
-        ))
+        df3 = pd.DataFrame(dict(r=selected_player2_stats[volume_stats].values[0],theta= volume_stats))
+        df4 = pd.DataFrame(dict(r=selected_player2_stats[efficiency_stats].values[0],theta= efficiency_stats))
+    
     fig3 = px.line_polar(df3, r='r', theta='theta', line_close=True)
     fig3.update_traces(fill='toself')
     fig3.update_layout(

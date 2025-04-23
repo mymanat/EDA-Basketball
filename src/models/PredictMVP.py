@@ -301,31 +301,31 @@ st.dataframe(current_reordered)
 # st.pyplot(plt.gcf())
 
 
-pred_current_year = model_svc.predict(current_reordered)
-prob_current_year = model_svc.predict_proba(current_reordered)[:,1]
-st.write("Number of MVP predictions according to SVC:", sum(pred_current_year))
-current_season_players['MVP Prediction'] = pred_current_year
-current_season_players['MVP Prediction Probability'] = prob_current_year
-top_mvp_candidates = current_season_players.sort_values(by='MVP Prediction Probability', ascending=False ).head(20)
-st.dataframe(top_mvp_candidates)
-importances = model.coef_[0]
-feature_names = X.columns
-sorted_indices = np.argsort(importances)[-10:]
-plt.barh(range(len(sorted_indices)), importances[sorted_indices], align='center')
-plt.yticks(range(len(sorted_indices)), feature_names[sorted_indices])
-st.pyplot(plt.gcf())
-
-
-# pred_current_year = xgb_model.predict(current_reordered)
-# prob_current_year = xgb_model.predict_proba(current_reordered)[:,1]
-# st.write("Number of MVP predictions according to XGBoost:", sum(pred_current_year))
-# current_reordered['MVP Prediction'] = pred_current_year
-# current_reordered['MVP Prediction Probability'] = prob_current_year
-# top_mvp_candidates = current_reordered.sort_values(by='MVP Prediction Probability', ascending=False ).head(20)
+# pred_current_year = model_svc.predict(current_reordered)
+# prob_current_year = model_svc.predict_proba(current_reordered)[:,1]
+# st.write("Number of MVP predictions according to SVC:", sum(pred_current_year))
+# current_season_players['MVP Prediction'] = pred_current_year
+# current_season_players['MVP Prediction Probability'] = prob_current_year
+# top_mvp_candidates = current_season_players.sort_values(by='MVP Prediction Probability', ascending=False ).head(20)
 # st.dataframe(top_mvp_candidates)
-# importances = xgb_model.feature_importances_
+# importances = model.coef_[0]
 # feature_names = X.columns
 # sorted_indices = np.argsort(importances)[-10:]
 # plt.barh(range(len(sorted_indices)), importances[sorted_indices], align='center')
 # plt.yticks(range(len(sorted_indices)), feature_names[sorted_indices])
 # st.pyplot(plt.gcf())
+
+
+pred_current_year = xgb_model.predict(current_reordered)
+prob_current_year = xgb_model.predict_proba(current_reordered)[:,1]
+st.write("Number of MVP predictions according to XGBoost:", sum(pred_current_year))
+current_reordered['MVP Prediction'] = pred_current_year
+current_reordered['MVP Prediction Probability'] = prob_current_year
+top_mvp_candidates = current_reordered.sort_values(by='MVP Prediction Probability', ascending=False ).head(20)
+st.dataframe(top_mvp_candidates)
+importances = xgb_model.feature_importances_
+feature_names = X.columns
+sorted_indices = np.argsort(importances)[-10:]
+plt.barh(range(len(sorted_indices)), importances[sorted_indices], align='center')
+plt.yticks(range(len(sorted_indices)), feature_names[sorted_indices])
+st.pyplot(plt.gcf())
