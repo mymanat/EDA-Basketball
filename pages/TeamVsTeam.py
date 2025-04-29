@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from src.constants import FIRST_YEAR_NBA, PREVIOUS_YEAR
+from src.visualization import visual
 
 st.set_page_config(page_title='Basketball Stats Explorer', layout='wide')
 st.title('Basketball Stats Explorer')
@@ -35,46 +36,18 @@ if st.button('Compare Teams'):
     ax.legend()
     st.pyplot(fig)
 
-    #visualize team1 PTS vs team2 PTS
-    team1_pts = selected_team1_stats['PTS'].values[0]
-    team2_pts = selected_team2_stats['PTS'].values[0]
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.bar([f'{selected_team1}', f'{selected_team2}'], [team1_pts, team2_pts], color=['skyblue', 'orange'])
-    ax.set_ylabel('PTS')
-    ax.set_title(f'{selected_year1} {selected_team1} vs {selected_year2} {selected_team2}')
-    ax.legend()
-    st.pyplot(fig)
-
     #visualize the team1 stats fg%,3p%,2p%,ft% vs team2 stats fg%,3p%,2p%,ft%
-    team1_stats = selected_team1_stats[['FG%','3P%','2P%','FT%']]
-    team2_stats = selected_team2_stats[['FG%','3P%','2P%','FT%']]
-    labels = team1_stats.columns
-    x = np.arange(len(labels))*2
-    width = 0.8
-    fig1, ax1 = plt.subplots(figsize=(14, 6))
-    ax1.bar(x-width/2, team1_stats.values[0], color='skyblue', label=f'{selected_team1}')
-    ax1.bar(x+width/2, team2_stats.values[0], color='orange', label=f'{selected_team2}')
-    ax1.set_ylabel('Mean')
-    ax1.set_xlabel('Stat')
-    ax1.set_xticklabels(labels)
-    ax1.set_xticks(x)
-    ax1.set_title(f'{selected_year1} {selected_team1} vs {selected_year2} {selected_team2}')
-    ax1.legend()
+    fig1, ax1= visual.plot_stat_team_comparator((14,6), selected_team1_stats[['FG%','3P%','2P%','FT%']], selected_team2_stats[['FG%','3P%','2P%','FT%']], selected_team1, selected_team2, selected_year1, selected_year2, 'Stat', 'Mean')
     st.pyplot(fig1)
 
     #visualize the team1 stats trb, ast, blk vs team2 stats trb, ast, blk
-    team1_stats = selected_team1_stats[['TRB','AST','BLK']]
-    team2_stats = selected_team2_stats[['TRB','AST','BLK']]
-    labels = team1_stats.columns
-    x = np.arange(len(labels))*2
-    width = 0.8
-    fig2, ax2 = plt.subplots(figsize=(14, 6))
-    ax2.bar(x-width/2, team1_stats.values[0], color='skyblue', label=f'{selected_team1}')
-    ax2.bar(x+width/2, team2_stats.values[0], color='orange', label=f'{selected_team2}')
-    ax2.set_ylabel('Mean')
-    ax2.set_xlabel('Stat')
-    ax2.set_xticklabels(labels)
-    ax2.set_xticks(x)
-    ax2.set_title(f'{selected_year1} {selected_team1} vs {selected_year2} {selected_team2}')
-    ax2.legend()
+    fig2, ax2= visual.plot_stat_team_comparator((14,6), selected_team1_stats[['PTS','TRB','AST','BLK']], selected_team2_stats[['PTS','TRB','AST','BLK']], selected_team1, selected_team2, selected_year1, selected_year2, 'Stat', 'Mean')
     st.pyplot(fig2)
+
+    #visualize the team1 stats eFG%_O,TOV%_O, ORB%_O vs team2 stats eFG%_O,TOV%_O, ORB%_O
+    fig3, ax3= visual.plot_stat_team_comparator((14,6), selected_team1_stats[['eFG%_O','TOV%_O','ORB%_O']], selected_team2_stats[['eFG%_O','TOV%_O','ORB%_O']], selected_team1, selected_team2, selected_year1, selected_year2, 'Stat', 'Mean')
+    st.pyplot(fig3)
+
+    #visualize the team1 stats eFG%_D,TOV%_D, ORB%_D vs team2 stats eFG%_D,TOV%_D, ORB%_D
+    fig4, ax4= visual.plot_stat_team_comparator((14,6), selected_team1_stats[['eFG%_D','TOV%_D','ORB%_D']], selected_team2_stats[['eFG%_D','TOV%_D','ORB%_D']], selected_team1, selected_team2, selected_year1, selected_year2, 'Stat', 'Mean')
+    st.pyplot(fig4)

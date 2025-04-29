@@ -7,6 +7,7 @@ from urllib.request import Request, urlopen
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from src.constants import PREVIOUS_YEAR, FIRST_YEAR_NBA
+from src.visualization import visual
 
 def get_html(url):
     req = Request(url, headers={ 'User-Agent': 'Mozilla/5.0'})
@@ -29,9 +30,7 @@ def load_teams(year):
 #load the data and remove the divisions in the rows as appeared in the website
 if selected_year < 1971:
     df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
-
     df2 = load_teams(selected_year)[1]
-
     merged_df = pd.merge(df1, df2, on='Team', how='inner')
 
     #create a 1 row of 2 columns to display the dataframes
@@ -58,7 +57,6 @@ if selected_year < 1971:
 elif selected_year>=1971 and selected_year<2016:
     df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
     df2 = load_teams(selected_year)[1].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
-
     df3 = load_teams(selected_year)[2]
 
     df1.rename(columns={'Eastern Conference':'Team'}, inplace=True)
@@ -93,7 +91,6 @@ elif selected_year>=1971 and selected_year<2016:
 else:
     df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
     df2 = load_teams(selected_year)[1].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
-
     df3 = load_teams(selected_year)[4]
 
     df1.rename(columns={'Eastern Conference':'Team'}, inplace=True)
@@ -130,12 +127,8 @@ df = pd.read_csv('data/raw/all_seasons_teams.csv')
 grouped = df.drop('Team', axis=1).select_dtypes(include='number').groupby('Year').mean()
 
 #plot the evolution of PPG
-fig, ax= plt.subplots(figsize=(10, 6))
-ax.plot(grouped.index, grouped['PTS'], color='skyblue', linestyle='-')
-ax.set_xlabel('Year')
-ax.set_ylabel('Average points scored per game')
-ax.set_title('Average points scored per game by all teams since 1950')
-st.pyplot(fig)
+fig1, ax1 = visual.plot_stat_evolution((10,6), grouped, 'PTS', 'Average points scored per game by all teams since 1950','Year', 'Average points scored per game')
+st.pyplot(fig1)
 
 row1=st.columns(3)
 row2=st.columns(3)
@@ -143,92 +136,45 @@ row3=st.columns(3)
 row4=st.columns(3)
 
 #row1 is all about 2P evolution
-fig2, ax2= plt.subplots(figsize=(6,4))
-ax2.plot(grouped.index, grouped['2P'], color='skyblue', linestyle='-')
-ax2.set_xlabel('Year')
-ax2.set_ylabel('Average 2P made per game')
-ax2.set_title('Average 2P made per game by all teams since 1950')
+fig2, ax2 = visual.plot_stat_evolution((6,4), grouped, '2P', 'Average 2P made per game by all teams since 1950','Year', 'Average 2P made per game')
 row1[0].pyplot(fig2)
 
-fig3, ax3= plt.subplots(figsize=(6,4))
-ax3.plot(grouped.index, grouped['2PA'], color='skyblue', linestyle='-')
-ax3.set_xlabel('Year')
-ax3.set_ylabel('Average 2P attempted per game')
-ax3.set_title('Average 2P attempted per game by all teams since 1950')
+fig3, ax3 = visual.plot_stat_evolution((6,4), grouped, '2PA', 'Average 2P attempted per game by all teams since 1950','Year', 'Average 2P attempted per game')
 row1[1].pyplot(fig3)
 
-fig4, ax4= plt.subplots(figsize=(6,4))
-ax4.plot(grouped.index, grouped['2P%'], color='skyblue', linestyle='-')
-ax4.set_xlabel('Year')
-ax4.set_ylabel('Average 2P% per game')
-ax4.set_title('Average 2P% per game by all teams since 1950')
+fig4, ax4 = visual.plot_stat_evolution((6,4), grouped, '2P%', 'Average 2P% per game by all teams since 1950','Year', 'Average 2P% per game')
 row1[2].pyplot(fig4)
 
 #row2 is all about 3P evolution
-fig5, ax5= plt.subplots(figsize=(6,4))
-ax5.plot(grouped.index, grouped['3P'], color='skyblue', linestyle='-')
-ax5.set_xlabel('Year')
-ax5.set_ylabel('Average 3P made per game')
-ax5.set_title('Average 3P made per game by all teams since 1980')
+fig5, ax5 = visual.plot_stat_evolution((6,4), grouped, '3P', 'Average 3P made per game by all teams since 1980','Year', 'Average 3P made per game')
 row2[0].pyplot(fig5)
 
-fig6, ax6= plt.subplots(figsize=(6,4))
-ax6.plot(grouped.index, grouped['3PA'], color='skyblue', linestyle='-')
-ax6.set_xlabel('Year')
-ax6.set_ylabel('Average 3P attempted per game')
-ax6.set_title('Average 3P attempted per game by all teams since 1980')
+fig6, ax6 = visual.plot_stat_evolution((6,4), grouped, '3PA', 'Average 3P attempted per game by all teams since 1980','Year', 'Average 3P attempted per game')
 row2[1].pyplot(fig6)
 
-fig7, ax7= plt.subplots(figsize=(6,4))
-ax7.plot(grouped.index, grouped['3P%'], color='skyblue', linestyle='-')
-ax7.set_xlabel('Year')
-ax7.set_ylabel('Average 3P% per game')
-ax7.set_title('Average 3P% per game by all teams since 1980')
+fig7, ax7 = visual.plot_stat_evolution((6,4), grouped, '3P%', 'Average 3P% per game by all teams since 1980','Year', 'Average 3P% per game')
 row2[2].pyplot(fig7)
 
 #row3 is all about FT(Free Throw) evolution
-fig8, ax8= plt.subplots()
-ax8.plot(grouped.index, grouped['FT'], color='skyblue', linestyle='-')
-ax8.set_xlabel('Year')
-ax8.set_ylabel('Average FT made per game')
-ax8.set_title('Average FT made per game by all teams since 1950')
+fig8, ax8 = visual.plot_stat_evolution((6,4), grouped, 'FT', 'Average FT made per game by all teams since 1950','Year', 'Average FT made per game')
 row3[0].pyplot(fig8)
 
-fig9, ax9= plt.subplots()
-ax9.plot(grouped.index, grouped['FTA'], color='skyblue', linestyle='-')
-ax9.set_xlabel('Year')
-ax9.set_ylabel('Average FT attempted per game')
-ax9.set_title('Average FT attempted per game by all teams since 1950')
+fig9, ax9 = visual.plot_stat_evolution((6,4), grouped, 'FTA', 'Average FT attempted per game by all teams since 1950','Year', 'Average FT attempted per game')
 row3[1].pyplot(fig9)
 
-fig10, ax10= plt.subplots()
-ax10.plot(grouped.index, grouped['FT%'], color='skyblue', linestyle='-')
-ax10.set_xlabel('Year')
-ax10.set_ylabel('Average FT% per game')
-ax10.set_title('Average FT% per game by all teams since 1950')
+fig10, ax10 = visual.plot_stat_evolution((6,4), grouped, 'FT%', 'Average FT% per game by all teams since 1950','Year', 'Average FT% per game')
 row3[2].pyplot(fig10)
 
 #TRB(Total Rebounds), AST(Assist), BLK(Block) per game evolution
-fig11, ax11= plt.subplots()
-ax11.plot(grouped.index, grouped['TRB'], color='skyblue', linestyle='-')
-ax11.set_xlabel('Year')
-ax11.set_ylabel('Average TRB made per game')
-ax11.set_title('Average TRB made per game by all teams since 1950')
+fig11, ax11 = visual.plot_stat_evolution((6,4), grouped, 'TRB', 'Average TRB made per game by all teams since 1950','Year', 'Average TRB made per game')
 row4[0].pyplot(fig11)
 
-fig12, ax12= plt.subplots()
-ax12.plot(grouped.index, grouped['AST'], color='skyblue', linestyle='-')
-ax12.set_xlabel('Year')
-ax12.set_ylabel('Average AST per game')
-ax12.set_title('Average AST per game by all teams since 1950')
+fig12, ax12 = visual.plot_stat_evolution((6,4), grouped, 'AST', 'Average AST per game by all teams since 1950','Year', 'Average AST per game')
 row4[1].pyplot(fig12)
 
-fig13, ax13= plt.subplots()
-ax13.plot(grouped.index, grouped['BLK'], color='skyblue', linestyle='-')
-ax13.set_xlabel('Year')
-ax13.set_ylabel('Average BLK per game')
-ax13.set_title('Average BLK per game by all teams since 1950')
+fig13, ax13 = visual.plot_stat_evolution((6,4), grouped, 'BLK', 'Average BLK per game by all teams since 1950','Year', 'Average BLK per game')
 row4[2].pyplot(fig13)
+
 
 
 
