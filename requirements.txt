@@ -6,4 +6,3 @@ seaborn
 requests
 urllib3
 lxml
-plotly
