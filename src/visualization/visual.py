@@ -33,7 +33,7 @@ def heatmap_corr(df, year):
     st.header(f'Correlation Heatmap of the {year} NBA Teams statistics')
     corr = df.corr()
     fig, ax = plt.subplots()
-    plot = sns.heatmap(corr, cmap='coolwarm')
+    plot = sns.heatmap(corr, cmap='coolwarm', annot=True, annot_kws={"size": 3})
     st.pyplot(fig)
 
 #plot the top stats that correlate with W/L%

@@ -82,7 +82,7 @@ if st.button('Correlation Heatmap'):
     df_players_numeric = df_players.select_dtypes(include=['number'])
     corr = df_players_numeric.corr()
     fig, ax = plt.subplots()
-    plot = sns.heatmap(corr, cmap='coolwarm')
+    plot = sns.heatmap(corr, cmap='coolwarm', annot=True, annot_kws={"size": 3})
     st.pyplot(fig)
 
 #display the all stars of that season
