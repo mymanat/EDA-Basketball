@@ -7,6 +7,7 @@ from urllib.request import Request, urlopen
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 from src.constants import PREVIOUS_YEAR, FIRST_YEAR_NBA
+from src.visualization import visual
 
 def get_html(url):
     req = Request(url, headers={ 'User-Agent': 'Mozilla/5.0'})
@@ -90,19 +91,21 @@ st.dataframe(as_df)
 
 #drop the columns that are not needed for the mean calculation and 
 # calculate the mean of each statistic for all stars and All Players
-as_stats = as_df.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards'], axis=1).mean(axis=0)
-all_stats = df_players.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards'], axis=1).mean(axis=0)
+as_stats = as_df.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG%', '3P%', '2P%', 'eFG%', 'FT%'], axis=1).mean(axis=0)
+all_stats = df_players.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG%', '3P%', '2P%', 'eFG%', 'FT%'], axis=1).mean(axis=0)
+
+as_stats_efficiency = as_df.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG', 'FGA', '3P', '3PA', '2P', '2PA', 'FT', 'FTA', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS'], axis=1).mean(axis=0)
+all_stats_efficiency = df_players.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG', 'FGA', '3P', '3PA', '2P', '2PA', 'FT', 'FTA', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS'], axis=1).mean(axis=0)
+
+row = st.columns(2)
 
 #visualize the all stars stats vs All Players stats
-fig2, ax2 = plt.subplots()
-ax2.bar(as_stats.index, as_stats, color='skyblue', label='All Stars')
-ax2.bar(all_stats.index, all_stats, color='orange', label='All Players')
-ax2.set_xlabel('Statistics')
-ax2.set_ylabel('Average per game')
-ax2.xaxis.set_tick_params(rotation=90)
-ax2.set_title(f'Average per game statistics of {selected_year} All Stars vs {selected_year} All Players')
-ax2.legend()
-st.pyplot(fig2)
+fig2, ax2 = visual.plot_player_type_comparator(as_stats, all_stats, 'All Stars', 'All Players', selected_year, 'Statistics', 'Average per game')
+row[0].pyplot(fig2)
+
+#visualize the all stars efficiency vs All Players efficiency
+fig3, ax3 = visual.plot_player_type_comparator(as_stats_efficiency, all_stats_efficiency, 'All Stars', 'All Players', selected_year, 'Statistics', 'Average per game')
+row[1].pyplot(fig3)
 
 #display the mvp with its statistics
 st.header(f'**MVP(Most Valuable Player) of the {selected_year} season**')
@@ -110,18 +113,18 @@ st.dataframe(df_mvp)
 
 #drop the columns that are not needed for the mean calculation and 
 # calculate the mean of each statistic for mvp
-mvp_stats = df_mvp.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards'], axis=1).mean(axis=0)
+mvp_stats = df_mvp.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards','FG%', '3P%', '2P%', 'eFG%', 'FT%'], axis=1).mean(axis=0)
+mvp_stats_efficiency = df_mvp.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG', 'FGA', '3P', '3PA', '2P', '2PA', 'FT', 'FTA', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS'], axis=1).mean(axis=0)
+
+row = st.columns(2)
 
 #visualize the mvp stats vs all-stars stats
-fig3, ax3 = plt.subplots()
-ax3.bar(mvp_stats.index, mvp_stats, color='skyblue', label='MVP')
-ax3.bar(as_stats.index, as_stats, color='orange', label='All-Stars')
-ax3.set_ylabel('Average per game')
-ax3.set_xlabel('Statistics')
-ax3.xaxis.set_tick_params(rotation=90)
-ax3.set_title(f'Average per game statistics of the {selected_year} MVP vs {selected_year} All Stars')
-ax3.legend()
-st.pyplot(fig3)
+fig4, ax4 = visual.plot_player_type_comparator(mvp_stats, as_stats, 'MVP', 'All Stars', selected_year, 'Statistics', 'Average per game')
+row[0].pyplot(fig4)
+
+#visualize the mvp efficiency vs all-stars efficiency
+fig5, ax5 = visual.plot_player_type_comparator(mvp_stats_efficiency, as_stats_efficiency, 'MVP', 'All Stars', selected_year, 'Statistics', 'Average per game')
+row[1].pyplot(fig5)
 
 #display the dpoy with its statistics
 st.header(f'**DPOY(Defensive Player Of the Year) of the {selected_year} season**')
@@ -129,18 +132,18 @@ st.dataframe(df_dpoy)
 
 #drop the columns that are not needed for the mean calculation and 
 # calculate the mean of each statistic for dpoy
-dpoy_stats = df_dpoy.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards'], axis=1).mean(axis=0)
+dpoy_stats = df_dpoy.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG%', '3P%', '2P%', 'eFG%', 'FT%'], axis=1).mean(axis=0)
+dpoy_stats_efficiency = df_dpoy.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG', 'FGA', '3P', '3PA', '2P', '2PA', 'FT', 'FTA', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS'], axis=1).mean(axis=0)
+
+row = st.columns(2)
 
 #visualize the dpoy stats vs All Players stats
-fig4, ax4 = plt.subplots()
-ax4.bar(dpoy_stats.index, dpoy_stats, color='skyblue', label='DPOY')
-ax4.bar(all_stats.index, all_stats, color='orange', label='All Players')
-ax4.set_ylabel('Average per game')
-ax4.set_xlabel('Statistics')
-ax4.xaxis.set_tick_params(rotation=90)
-ax4.set_title(f'Average per game statistics of the {selected_year} DPOY vs {selected_year} All Players')
-ax4.legend()
-st.pyplot(fig4)
+fig6, ax6 = visual.plot_player_type_comparator(dpoy_stats, all_stats, 'DPOY', 'All Players', selected_year, 'Statistics', 'Average per game')
+row[0].pyplot(fig6)
+
+#visualize the dpoy efficiency vs All Players efficiency
+fig7, ax7 = visual.plot_player_type_comparator(dpoy_stats_efficiency, all_stats_efficiency, 'DPOY', 'All Players', selected_year, 'Statistics', 'Average per game')
+row[1].pyplot(fig7)
 
 #display the roy with its statistics
 st.header(f'**ROY(Rookie Of the Year) of the {selected_year} season**')
@@ -148,17 +151,17 @@ st.dataframe(df_roy)
 
 #drop the columns that are not needed for the mean calculation and 
 # calculate the mean of each statistic for roy
-roy_stats = df_roy.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards'] , axis=1).mean(axis=0)
+roy_stats = df_roy.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG%', '3P%', '2P%', 'eFG%', 'FT%'] , axis=1).mean(axis=0)
+roy_stats_efficiency = df_roy.drop(['Age','G','GS', 'MP','Player','Team','Pos', 'Awards', 'FG', 'FGA', '3P', '3PA', '2P', '2PA', 'FT', 'FTA', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS'], axis=1).mean(axis=0)
+
+row = st.columns(2)
 
 #visualize the roy stats vs All Players stats 
-fig5, ax5 = plt.subplots()
-ax5.bar(roy_stats.index, roy_stats, color='skyblue', label='ROY')
-ax5.bar(all_stats.index, all_stats, color='orange', label='All Players')
-ax5.set_ylabel('Average per game')
-ax5.set_xlabel('Statistics')
-ax5.xaxis.set_tick_params(rotation=90)
-ax5.set_title(f'Average per game statistics of the {selected_year} ROY vs {selected_year} All Players')
-ax5.legend()
-st.pyplot(fig5)
+fig8, ax8 = visual.plot_player_type_comparator(roy_stats, all_stats, 'ROY', 'All Players', selected_year, 'Statistics', 'Average per game')
+row[0].pyplot(fig8)
+
+#visualize the roy efficiency vs All Players efficiency
+fig9, ax9 = visual.plot_player_type_comparator(roy_stats_efficiency, all_stats_efficiency, 'ROY', 'All Players', selected_year, 'Statistics', 'Average per game')
+row[1].pyplot(fig9)
 
 

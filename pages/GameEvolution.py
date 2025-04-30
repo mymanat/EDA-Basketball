@@ -40,19 +40,9 @@ if selected_year < 1971:
     
     #highest correlation with winrate
     if st.button('Correlation Heatmap'):
-        st.header(f'Correlation Heatmap of the {selected_year} NBA Teams statistics')
         all_teams_stats_numeric = all_teams_stats.apply(pd.to_numeric, errors='coerce').select_dtypes(include=['number']).dropna(axis=1, how='all')
-        corr = all_teams_stats_numeric.corr()
-        fig, ax = plt.subplots()
-        plot = sns.heatmap(corr, cmap='coolwarm')
-        st.pyplot(fig)
-
-        fig, ax = plt.subplots()
-        plot = all_teams_stats_numeric.corr()['W/L%'].drop(index='W/L%', errors='ignore').sort_values().plot(kind='bar', ax=ax)
-        ax.set_xlabel('Statistics')
-        ax.set_ylabel('Correlation with W/L%')
-        ax.set_title(f'Correlation of different statistics impacting the W/L% for the {selected_year} season')
-        st.pyplot(fig)
+        visual.heatmap_corr(all_teams_stats_numeric, selected_year)
+        visual.plot_winloss_corr(all_teams_stats_numeric, selected_year)
 
 elif selected_year>=1971 and selected_year<2016:
     df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
@@ -74,19 +64,9 @@ elif selected_year>=1971 and selected_year<2016:
 
     #highest correlation with winrate
     if st.button('Correlation Heatmap'):
-        st.header(f'Correlation Heatmap of the {selected_year} NBA Teams statistics')
         all_teams_stats_numeric = all_teams_stats.apply(pd.to_numeric, errors='coerce').select_dtypes(include=['number']).dropna(axis=1, how='all')
-        corr = all_teams_stats_numeric.corr()
-        fig, ax = plt.subplots()
-        plot = sns.heatmap(corr, cmap='coolwarm')
-        st.pyplot(fig)
-
-        fig, ax = plt.subplots()
-        plot = all_teams_stats_numeric.corr()['W/L%'].drop(index='W/L%', errors='ignore').sort_values().plot(kind='bar', ax=ax)
-        ax.set_xlabel('Statistics')
-        ax.set_ylabel('Correlation with W/L%')
-        ax.set_title(f'Correlation of different statistics impacting the W/L% for the {selected_year} season')
-        st.pyplot(fig)
+        visual.heatmap_corr(all_teams_stats_numeric, selected_year)
+        visual.plot_winloss_corr(all_teams_stats_numeric, selected_year)
 
 else:
     df1 = load_teams(selected_year)[0].loc[lambda d: pd.to_numeric(d['W'], errors='coerce').notna()]
@@ -108,19 +88,10 @@ else:
 
     #highest correlation with winrate
     if st.button('Correlation Heatmap'):
-        st.header(f'Correlation Heatmap of the {selected_year} NBA Teams statistics')
         all_teams_stats_numeric = all_teams_stats.apply(pd.to_numeric, errors='coerce').select_dtypes(include=['number']).dropna(axis=1, how='all')
-        corr = all_teams_stats_numeric.corr()
-        fig, ax = plt.subplots()
-        plot = sns.heatmap(corr, cmap='coolwarm')
-        st.pyplot(fig)
+        visual.heatmap_corr(all_teams_stats_numeric, selected_year)
+        visual.plot_winloss_corr(all_teams_stats_numeric, selected_year)
 
-        fig, ax = plt.subplots()
-        plot = all_teams_stats_numeric.corr()['W/L%'].drop(index='W/L%', errors='ignore').sort_values().plot(kind='bar', ax=ax)
-        ax.set_xlabel('Statistics')
-        ax.set_ylabel('Correlation with W/L%')
-        ax.set_title(f'Correlation of different statistics impacting the W/L% for the {selected_year} season')
-        st.pyplot(fig)
 
 df = pd.read_csv('data/raw/all_seasons_teams.csv')
 
