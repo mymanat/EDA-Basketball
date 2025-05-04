@@ -1,7 +1,5 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.express as px
 from src.constants import FIRST_YEAR_NBA, PREVIOUS_YEAR
 
