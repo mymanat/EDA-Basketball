@@ -18,8 +18,8 @@ def plot_stat_team_comparator(figsize, team1_stats, team2_stats, team1_name, tea
     x = np.arange(len(labels))*2
     width = 0.8
     fig, ax = plt.subplots(figsize=figsize)
-    ax.bar(x-width/2, team1_stats.values[0], color='skyblue', label=f'{team1_name}')
-    ax.bar(x+width/2, team2_stats.values[0], color='orange', label=f'{team2_name}')
+    ax.bar(x-width/2, team1_stats.values[0], color='skyblue', label=f'{year1} {team1_name}')
+    ax.bar(x+width/2, team2_stats.values[0], color='orange', label=f'{year2} {team2_name}')
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
     ax.set_xticklabels(labels)
