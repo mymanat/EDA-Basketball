@@ -26,11 +26,21 @@ def load_data(year):
     url = "https://www.basketball-reference.com/leagues/NBA_" + str(year) + "_per_game.html"
     html = pd.read_html(get_html(url), header = 0)
     df = html[0]
+    df = df.drop(df.loc[df['Player']=='League Average'].index)
     return df
 
 #load the players for that specific year and drop the rank column
 df_players = load_data(selected_year)
 df_players = df_players.drop(columns=['Rk'])
+
+#select the teams from the sidebar
+selected_team = st.sidebar.multiselect('Team', df_players['Team'].unique(), df_players['Team'].unique())
+
+#select the position from the sidebar
+selected_pos = st.sidebar.multiselect('Position', df_players['Pos'].unique(), df_players['Pos'].unique())
+
+#filtered data
+df_players_filtered = df_players[(df_players['Team'].isin(selected_team))&(df_players['Pos'].isin(selected_pos))]
 
 #function to load the mvp for that year
 @st.cache_data
@@ -74,13 +84,13 @@ as_df.reset_index(drop=True, inplace=True)
 
 #all the players of that season
 st.header(f'**Players of the {selected_year} season**')
-st.dataframe(df_players)
+st.dataframe(df_players_filtered)
 
 #find the biggest correlation between stats of All Players displayed in a heatmap
 if st.button('Correlation Heatmap'):
     st.header(f'Correlation Heatmap of the {selected_year} NBA players statistics')
-    df_players_numeric = df_players.select_dtypes(include=['number'])
-    corr = df_players_numeric.corr()
+    df_players_filtered_numeric = df_players_filtered.select_dtypes(include=['number'])
+    corr = df_players_filtered_numeric.corr()
     fig, ax = plt.subplots()
     plot = sns.heatmap(corr, cmap='coolwarm', annot=True, annot_kws={"size": 3})
     st.pyplot(fig)
