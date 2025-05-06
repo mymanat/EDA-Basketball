@@ -138,27 +138,26 @@ linear_regression_model = joblib.load('src/models/linear_regression_model.pkl')
 current_reordered = current[df[df['Year'] >= 2014].drop(['Player', 'Age', 'Team', 'Player-Pos', 'Player-Awards', 'Player-GS', 'Team-MP'], axis=1).reset_index(drop=True).columns]
 current_reordered = current_reordered.apply(pd.to_numeric, errors='coerce')
 
-if(st.button('Predict MVP')):
-    pred_current_year = linear_regression_model.predict(current_reordered)
-    prob_current_year = linear_regression_model.predict_proba(current_reordered)[:,1]
-    st.write("Number of MVP predictions according to logistic regression:", sum(pred_current_year))
-    current_reordered['MVP Prediction'] = pred_current_year
-    current_reordered['MVP Prediction Probability'] = prob_current_year
-    current_season_players_with_preds = current_season_players.copy()
-    current_season_players_with_preds['MVP Prediction'] = pred_current_year
-    current_season_players_with_preds['MVP Prediction Probability'] = prob_current_year
-    top_mvp_candidates = current_season_players_with_preds[current_season_players_with_preds['MVP Prediction']==1].sort_values(by='MVP Prediction Probability', ascending=False )
-    st.dataframe(top_mvp_candidates)
+pred_current_year = linear_regression_model.predict(current_reordered)
+prob_current_year = linear_regression_model.predict_proba(current_reordered)[:,1]
+st.write("Number of MVP predictions according to logistic regression:", sum(pred_current_year))
+current_reordered['MVP Prediction'] = pred_current_year
+current_reordered['MVP Prediction Probability'] = prob_current_year
+current_season_players_with_preds = current_season_players.copy()
+current_season_players_with_preds['MVP Prediction'] = pred_current_year
+current_season_players_with_preds['MVP Prediction Probability'] = prob_current_year
+top_mvp_candidates = current_season_players_with_preds[current_season_players_with_preds['MVP Prediction']==1].sort_values(by='MVP Prediction Probability', ascending=False )
+st.dataframe(top_mvp_candidates)
 
-    #Visualize the top 10 MVP features
-    importances = linear_regression_model.coef_[0]
-    feature_names = df[df['Year'] >= 2014].drop(['Player', 'Age', 'Team', 'Player-Pos', 'Player-Awards', 'Player-GS', 'Team-MP'], axis=1).reset_index(drop=True).columns
-    sorted_indices = np.argsort(importances)[-10:]
-    plt.subplots(figsize=(10, 5))
-    plt.barh(range(len(sorted_indices)), importances[sorted_indices], align='center')
-    plt.yticks(range(len(sorted_indices)), feature_names[sorted_indices])
-    plt.title('Top 10 Feature Importances to MVP Prediction')
-    st.pyplot(plt.gcf())
+#Visualize the top 10 MVP features
+importances = linear_regression_model.coef_[0]
+feature_names = df[df['Year'] >= 2014].drop(['Player', 'Age', 'Team', 'Player-Pos', 'Player-Awards', 'Player-GS', 'Team-MP'], axis=1).reset_index(drop=True).columns
+sorted_indices = np.argsort(importances)[-10:]
+plt.subplots(figsize=(10, 5))
+plt.barh(range(len(sorted_indices)), importances[sorted_indices], align='center')
+plt.yticks(range(len(sorted_indices)), feature_names[sorted_indices])
+plt.title('Top 10 Feature Importances to MVP Prediction')
+st.pyplot(plt.gcf())
 
 
 
