@@ -1,5 +1,4 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from src.constants import FIRST_YEAR_NBA, PREVIOUS_YEAR
@@ -26,7 +25,7 @@ if st.button('Compare Teams'):
     st.header(f'{selected_year2} {selected_team2}')
     st.dataframe(selected_team2_stats)
 
-    #vizualise team1 w/l% vs team w/L%
+    #vizualise team1 w/l% vs team2 w/L%
     team1_wl = selected_team1_stats['W'].values[0]/selected_team1_stats['G'].values[0]
     team2_wl = selected_team2_stats['W'].values[0]/selected_team2_stats['G'].values[0]
     fig, ax = plt.subplots(figsize=(10, 5))
