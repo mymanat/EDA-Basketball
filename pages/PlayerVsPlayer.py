@@ -20,7 +20,7 @@ efficiency_stats = ['Player-FG%','Player-FT%','Player-2P%','Player-3P%','Player-
 
 #display stats for player1
 player1 = st.header("First Player selected:")
-selected_year1 = st.selectbox('Year1', ['All Time']+list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
+selected_year1 = st.selectbox('Year', ['All Time']+list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
 if selected_year1 == 'All Time':
     selected_player1 = st.selectbox('Player1', playersdf['Player'].unique())
     selected_player1_stats = playersdf.loc[playersdf['Player']==selected_player1]
@@ -30,7 +30,7 @@ else:
 
 #display stats for player2
 player2 = st.header("Second Player selected:")
-selected_year2 = st.selectbox('Year2', ['All Time']+list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
+selected_year2 = st.selectbox('Year1', ['All Time']+list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
 if selected_year2 == 'All Time':
     selected_player2 = st.selectbox('Player2', playersdf['Player'].unique())
     selected_player2_stats = playersdf.loc[playersdf['Player']==selected_player2]
