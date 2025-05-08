@@ -13,7 +13,14 @@ def get_html(url):
     return res
 
 st.set_page_config(page_title='Basketball Stats Explorer', layout='wide')
-st.title('Basketball Stats Explorer')
+st.title('🏀 NBA Statistics Explorer')
+
+st.markdown("""
+    <style>
+    h1 {color: #FF4500;}
+    .stButton>button {background-color: #FF4500; color: white;}
+    </style>
+""", unsafe_allow_html=True)
 
 #sidebar to select the year
 selected_year = st.sidebar.selectbox('Year', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))
@@ -32,6 +39,7 @@ if selected_year < 1971:
     merged_df = pd.merge(df1, df2, on='Team', how='inner')
 
     #create a 1 row of 2 columns to display the dataframes
+    st.header(f'{selected_year} NBA Teams Standings')
     st.dataframe(merged_df)
 
     all_teams_stats = merged_df.drop(['G', 'W', 'SRS', 'L', 'GB'], axis=1)
@@ -56,6 +64,7 @@ elif selected_year>=1971 and selected_year<2016:
     all_teams_stats = pd.concat([merged_df1,merged_df2], ignore_index=True, axis=0).drop(['G', 'W', 'SRS', 'L', 'GB'], axis=1)
     
     #create a 1 row of 2 columns to display the dataframes
+    st.header(f'{selected_year} NBA Teams Standings')
     rows = st.columns(2)
     rows[0].dataframe(merged_df1)
     rows[1].dataframe(merged_df2)
@@ -80,6 +89,7 @@ else:
     all_teams_stats = pd.concat([merged_df1,merged_df2], ignore_index=True, axis=0).drop(['G', 'W', 'SRS', 'L', 'GB'], axis=1)
     
     #create a 1 row of 2 columns to display the dataframes
+    st.header(f'{selected_year} NBA Teams Standings')
     rows = st.columns(2)
     rows[0].dataframe(merged_df1)
     rows[1].dataframe(merged_df2)
@@ -94,6 +104,8 @@ else:
 df = pd.read_csv('data/raw/all_seasons_teams.csv')
 
 grouped = df.drop('Team', axis=1).select_dtypes(include='number').groupby('Year').mean()
+
+st.header('NBA Statistics Evolution')
 
 #plot the evolution of PPG
 fig1, ax1 = visual.plot_stat_evolution((10,6), grouped, 'PTS', 'Average points scored per game by all teams since 1950','Year', 'Average points scored per game')

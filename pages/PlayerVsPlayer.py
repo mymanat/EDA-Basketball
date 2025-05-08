@@ -4,7 +4,14 @@ import plotly.express as px
 from src.constants import FIRST_YEAR_NBA, PREVIOUS_YEAR
 
 st.set_page_config(page_title='Basketball Stats Explorer', layout='wide')
-st.title('Basketball Stats Explorer')
+st.title('🏀 NBA Statistics Explorer')
+
+st.markdown("""
+    <style>
+    h1 {color: #FF4500;}
+    .stButton>button {background-color: #FF4500; color: white;}
+    </style>
+""", unsafe_allow_html=True)
 
 playersdf = pd.read_csv('data/raw/all_seasons_players.csv')
 
