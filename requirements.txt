@@ -8,3 +8,6 @@ urllib3
 lxml
 plotly
 joblib
+sklearn
+scikit-learn
+xgboost
