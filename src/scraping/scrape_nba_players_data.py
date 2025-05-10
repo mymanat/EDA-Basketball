@@ -1,11 +1,9 @@
 import os
 import streamlit as st
 import pandas as pd
-from urllib.request import Request, urlopen
-import time
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-from src.constants import TEAM_MAPPING, FIRST_YEAR_MVP, PREVIOUS_YEAR
+from src.constants import TEAM_MAPPING, FIRST_YEAR_NBA, PREVIOUS_YEAR
 from src.utils import scrape
 
 st.set_page_config(page_title='Basketball Statistics Explorer', layout='wide')
@@ -15,13 +13,13 @@ all_seasons_players_csv ='data/raw/all_seasons_players.csv'
 if os.path.exists(all_seasons_players_csv):
     all_seasons_players = pd.read_csv(all_seasons_players_csv)
 else:
-    df1 = scrape.player_stats(FIRST_YEAR_MVP,PREVIOUS_YEAR)
-    df2 = scrape.player_advanced_stats(FIRST_YEAR_MVP,PREVIOUS_YEAR)
+    df1 = scrape.player_stats(FIRST_YEAR_NBA,PREVIOUS_YEAR)
+    df2 = scrape.player_advanced_stats(FIRST_YEAR_NBA,PREVIOUS_YEAR)
     df_players_combined = pd.merge(df1, df2, on=['Year', 'Player', 'Team'], how='inner')
     df_players_combined['Team'] = df_players_combined['Team'].map(TEAM_MAPPING)
     df_players_combined.rename(columns={col: f'Player-{col}' for col in df_players_combined.columns.to_list()[4:]}, inplace=True)
-    df3 = scrape.team_stats(FIRST_YEAR_MVP,PREVIOUS_YEAR)
-    df4 = scrape.team_advanced_stats(FIRST_YEAR_MVP,PREVIOUS_YEAR)
+    df3 = scrape.team_stats(FIRST_YEAR_NBA,PREVIOUS_YEAR)
+    df4 = scrape.team_advanced_stats(FIRST_YEAR_NBA,PREVIOUS_YEAR)
 
     df_teams_combined = pd.merge(df3, df4, on=['Year', 'Team'], how='inner')
     df_teams_combined.rename(columns={col: f'Team-{col}' for col in df_teams_combined.columns.to_list()[2:]}, inplace=True)

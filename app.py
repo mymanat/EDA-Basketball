@@ -15,7 +15,14 @@ def get_html(url):
     return res
 
 st.set_page_config(page_title='Basketball Statistics Explorer', layout='wide')
-st.title('Basketball Statistics Explorer')
+st.title('🏀 NBA Statistics Explorer')
+
+st.markdown("""
+    <style>
+    h1 {color: #FF4500;}
+    .stButton>button {background-color: #FF4500; color: white;}
+    </style>
+""", unsafe_allow_html=True)
 
 #sidebar to select the year
 selected_year = st.sidebar.selectbox('Year', list(reversed(range(FIRST_YEAR_NBA,PREVIOUS_YEAR+1))))

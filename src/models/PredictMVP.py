@@ -1,12 +1,8 @@
-import os
-import streamlit as st
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-from src.constants import TEAM_MAPPING, CURRENT_YEAR
-from src.utils import scrape
+import numpy as np
+from sklearn.metrics import accuracy_score
+import streamlit as st
+import pandas as pd
 
 st.set_page_config(page_title='Basketball Statistics Explorer', layout='wide')
 st.title('MVP Classifier')
@@ -81,13 +77,29 @@ print(classification_report(y_test, predictions))
 print(confusion_matrix(y_test, predictions))
 print(roc_auc_score(y_test, model.predict_proba(X_test)[:,1]))
 
-rfc = RandomForestClassifier(n_estimators=300)
+rfc = RandomForestClassifier(n_estimators=100, oob_score=True, bootstrap=True)
 rfc.fit(X_train, y_train)
 rfc_pred = rfc.predict(X_test)
 print("Random Forest Classifier after over-sampling")
+print('OOB score:', rfc.oob_score_)
 print(classification_report(y_test, rfc_pred))
 print(confusion_matrix(y_test, rfc_pred))
 print(roc_auc_score(y_test, rfc.predict_proba(X_test)[:,1]))
+
+pred = []
+for tree in rfc.estimators_:
+    pred.append(tree.predict_proba(X_test)[None, :])
+pred = np.vstack(pred)
+cum_mean = np.cumsum(pred, axis=0)/np.arange(1, pred.shape[0] + 1)[:, None, None]
+
+scores = []
+for pred in cum_mean:
+    scores.append(accuracy_score(y_test, np.argmax(pred, axis=1)))
+plt.figure(figsize=(10, 6))
+plt.plot(scores, linewidth=3)
+plt.xlabel('num_trees')
+plt.ylabel('accuracy')
+st.pyplot(plt)
 
 model_svc = SVC(probability=True)
 model_svc.fit(X_train,y_train)

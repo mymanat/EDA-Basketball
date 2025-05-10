@@ -10,12 +10,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from src.constants import TEAM_MAPPING, CURRENT_YEAR
 from src.utils import scrape
 
-st.title('Basketball MVP Stats Explorer')
+st.title('🏀 NBA Statistics Explorer')
 
 df = pd.read_csv('data/raw/all_seasons_players.csv')
 
 mvpdf = df[df['Player-Awards'].fillna('').str.contains(r'\bMVP-1\b')].set_index('Year')
 
+st.header('NBA MVPs')
 st.dataframe(mvpdf)
 
 rows=st.columns(2)
@@ -98,7 +99,7 @@ else:
     new_df[cols_to_multiply] = new_df[cols_to_multiply].multiply(100).round(3)
     new_df.to_csv(current_season_players_csv, index=False)
 
-st.title(f"{CURRENT_YEAR} season players")
+st.header(f'{CURRENT_YEAR} season players')
 st.dataframe(current_season_players)
 
 current = current_season_players.drop(['Player', 'Age', 'Team', 'Player-Pos', 'Player-Awards', 'Player-GS', 'Team-MP'], axis=1).reset_index(drop=True)
