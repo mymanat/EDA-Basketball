@@ -6,8 +6,5 @@ seaborn
 requests
 urllib3
 lxml
-<<<<<<< HEAD
-=======
 plotly
 joblib
->>>>>>> ML
