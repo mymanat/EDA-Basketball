@@ -27,12 +27,12 @@ The dataset used in this project contains basketball-related statistics such as:
 
 ## Getting Started
 1. Clone the repo
-    git clone https://github.com/yourusername/EDA-Basketball.git
-    cd EDA-Basketball
+    - git clone https://github.com/yourusername/EDA-Basketball.git
+    - cd EDA-Basketball
 
 2. Install dependencies
-    pip install -r requirements.txt
+    - pip install -r requirements.txt
 
 3. Launch the streamlit app
-    streamlit run app.py
+    - streamlit run app.py
 
